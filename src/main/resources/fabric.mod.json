@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "scroll",
+	"version": "${version}",
+	"name": "Scroll",
+	"description": "A Skript loader for the Fabric API",
+	"authors": [
+		"LimeGlass"
+	],
+	"contact": {
+		"homepage": "https://skriptlang.org",
+		"sources": "https://github.com/SkriptLang"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/scroll/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.skriptlang.scroll.Scroll"
+		],
+		"client": [
+			"com.skriptlang.scroll.ScrollClient"
+		],
+		"server": [
+			"com.skriptlang.scroll.ScrollServer"
+		]
+	},
+	"depends": {
+		"fabricloader": "*",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}

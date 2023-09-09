@@ -1,0 +1,12 @@
+# Author(s):
+# 	- Mwexim
+# Date: 2020/12/22
+
+test:
+	set {var} to color from hex "a903fc"
+	assert red value of {var} = 169 with "Red value should be 169: %red value of {var}%"
+	assert green value of {var} = 3 with "Green value should be 3: %green value of {var}%"
+	assert blue value of {var} = 252 with "Blue value should be 252: %blue value of {var}%"
+	assert alpha value of {var} = 255 with "Alpha value should be 255: %alpha value of {var}%"
+
+	assert hex value of yellow = "ffff00" with "Hex value of yellow should be 'ffff00': %hex value of yellow%"

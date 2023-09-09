@@ -1,0 +1,16 @@
+# Author(s):
+# 	- Mwexim
+# Date(s):
+#	- 2020/11/07
+#	- 2021/03/07 (R-string removal)
+
+test:
+	set {var} to "Hello World"
+	assert length of {var} = 11 with "length of {var} didn't work: %length of {var}% != 11"
+
+	set {var} to 'I can put &here <whatever> I like%!'
+	assert {var} = "I can put \&here \<whatever> I like%%!"
+
+	throws "I hope I can put &here <whatever> I like"
+
+	assert "Hello \tWorld!" = "Hello 	World!" with "'\t'-character did not work."

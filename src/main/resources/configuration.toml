@@ -1,0 +1,18 @@
+
+# Main configurations for Scroll.
+
+# Configurations regarding language settings.
+[languages]
+# The languages are based on the file name inside the /languages folder.
+language = "english"
+
+# All configurations relating to scroll itself.
+[scroll]
+
+	# Configurations relating to commands.
+	[scroll.commands]
+	# The required permission level to execute the /scroll command. Level 4 is Operator, 2 is Game master, 0 is everyone (unless changed in server.properties).
+	# If running in single player, this value is not needed.
+	permission-level = 0
+	# Disable the /scroll command
+	enabled = true
