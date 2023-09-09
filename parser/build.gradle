@@ -19,7 +19,7 @@ dependencies {
     implementation "org.jetbrains:annotations:15.0"
     implementation group: "com.google.code.findbugs", name: "jsr305", version: "3.0.2"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.4.1"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.4.1"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.10.0"
     testImplementation "junit:junit:4.12"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.1"
 }
