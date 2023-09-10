@@ -8,6 +8,7 @@ language = "english"
 
 # All configurations relating to scroll itself.
 [scroll]
+debug = false
 
 	# Configurations relating to commands.
 	[scroll.commands]

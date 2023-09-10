@@ -45,7 +45,30 @@ public class ScrollCommand {
 									}
 								})
 								.executes(context -> {
-									context.getSource().sendMessage(Text.literal("TODO Reload " + context.getArgument("file", String.class)));
+									String argument = context.getArgument("file", String.class);
+									switch (argument) {
+										case "configuration":
+											if (Scroll.CONFIGURATION.reload()) {
+												context.getSource().sendMessage(Text.literal(Scroll.language("configuration.reload.success")));
+											} else {
+												context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scroll.reload.failed", "configuration.toml")));
+											}
+											break;
+										case "languages":
+											if (Scroll.LANGUAGE.reload()) {
+												context.getSource().sendMessage(Text.literal(Scroll.language("language.reload.success")));
+											} else {
+												context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scroll.reload.failed", Scroll.LANGUAGE.getLanguage() + ".properties")));
+											}
+											break;
+										default:
+											if (ScrollScriptLoader.getScriptByName(argument).orElseThrow().reload()) {
+												context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.reload.success", argument)));
+											} else {
+												context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.reload.failed", argument)));
+											}
+											break;
+									}
 									return 0;
 								})))
 						.executes(context -> {
@@ -53,12 +76,6 @@ public class ScrollCommand {
 							return 0;
 						}));
 				dispatcher.register(literal("scroll").redirect(scroll));
-		//			dispatcher.register(literal("foo").executes(context -> {
-		//				 context.getSource().sendMessage(Text.literal("Called /foo with no arguments"));
-		//		          // For versions since 1.20, please use the following, which is intended to avoid creating Text objects if no feedback is needed.
-		//		          context.getSource().sendMessage(() -> Text.literal("Called /foo with no arguments"));
-		//		          return 1;
-		//			});
 			});
 		}
 	}

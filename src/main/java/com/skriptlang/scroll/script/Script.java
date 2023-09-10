@@ -1,16 +1,23 @@
 package com.skriptlang.scroll.script;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.apache.commons.lang3.Validate;
+
+import com.skriptlang.scroll.ScrollScriptLoader;
+import com.skriptlang.scroll.language.Reloadable;
 
 /**
  * Represents a parsed and loaded Script.
  */
-public class Script {
+public class Script implements Reloadable {
 
 	private final Path path;
 
 	public Script(Path path) {
+		Validate.isTrue(!Files.isDirectory(path), "The path of the script was a directory. Must be a single file.");
 		this.path = path;
 	}
 
@@ -25,6 +32,15 @@ public class Script {
 
 	public File getFile() {
 		return path.toFile();
+	}
+
+	public Path getPath() {
+		return path;
+	}
+
+	@Override
+	public boolean reload() {
+		return ScrollScriptLoader.reloadScript(this).isPresent();
 	}
 
 }

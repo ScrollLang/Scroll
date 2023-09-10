@@ -13,6 +13,7 @@ import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.tomlj.TomlTable;
 
+import com.skriptlang.scroll.language.Reloadable;
 import com.skriptlang.scroll.utils.FileUtils;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -21,18 +22,18 @@ import net.fabricmc.loader.api.ModContainer;
 /**
  * Main class for loading languages from the properties files.
  */
-public class LanguageProperties {
+public class Language implements Reloadable {
 
 	private static final Path languagesFolder = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/languages"));
-
-	private final TomlTable languageConfigurations;
 	private final ModContainer modContainer;
-	private final Properties properties;
-	private final Properties english;
-	private final String language;
 
-	LanguageProperties(Scroll instance) throws FileNotFoundException, IOException {
-		this.languageConfigurations = instance.getConfiguration().getLanguageSection();
+	private Properties properties;
+	private Properties english;
+
+	private String language;
+
+	Language(Scroll instance) throws FileNotFoundException, IOException {
+		TomlTable languageConfigurations = instance.getConfiguration().getLanguageSection();
 		this.language = languageConfigurations.getString("languages.language", () -> "english");
 		this.modContainer = instance.getModContainer();
 		this.properties = this.loadLanguage();
@@ -82,6 +83,20 @@ public class LanguageProperties {
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(path.toFile()));
 		return properties;
+	}
+
+	@Override
+	public boolean reload() {
+		TomlTable languageConfigurations = Scroll.CONFIGURATION.getLanguageSection();
+		this.language = languageConfigurations.getString("languages.language", () -> "english");
+		try {
+			this.properties = this.loadLanguage();
+			this.english = this.loadEnglish();
+			return true;
+		} catch (InvalidPathException | IOException exception) {
+			Scroll.printException(exception, Scroll.languageFormat("language.reload.fail", "scroll/configuration.toml"));
+			return false;
+		}
 	}
 
 	/**

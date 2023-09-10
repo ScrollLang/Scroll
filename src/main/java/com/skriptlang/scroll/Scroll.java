@@ -31,7 +31,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Scroll");
 	public static Configuration CONFIGURATION;
-	public static LanguageProperties LANGUAGE;
+	public static Language LANGUAGE;
 	public static ModContainer MOD_CONTAINER;
 
 	private static SkriptRegistration registration;
@@ -42,7 +42,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		MOD_CONTAINER = FabricLoader.getInstance().getModContainer("scroll").orElseThrow();
 		try {
 			CONFIGURATION = new Configuration(this);
-			LANGUAGE = new LanguageProperties(this);
+			LANGUAGE = new Language(this);
 		} catch (IOException exception) {
 			printException(exception, "Could not load the configuration/properties files!");
 			return;
@@ -71,7 +71,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		registration.register();
 
 		SCROLL_PATH = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
-		ScrollScriptLoader.loadScripts(SCROLL_PATH.resolve("scripts"));
+		ScrollScriptLoader.loadScriptsDirectory(SCROLL_PATH.resolve("scripts"));
 		// TODO Deal with triggers not getting cleared after a reload.
 	}
 
