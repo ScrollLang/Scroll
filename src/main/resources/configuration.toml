@@ -17,3 +17,5 @@ debug = false
 	permission-level = 0
 	# Disable the /scroll command
 	enabled = true
+	# When enabling a script, remove the disabled prefix from the command suggestions
+	remove-disabled-prefix = false

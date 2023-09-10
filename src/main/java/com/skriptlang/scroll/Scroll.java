@@ -2,8 +2,10 @@ package com.skriptlang.scroll;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UnknownFormatConversionException;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
@@ -31,15 +33,16 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Scroll");
 	public static Configuration CONFIGURATION;
-	public static Language LANGUAGE;
 	public static ModContainer MOD_CONTAINER;
+	public static Language LANGUAGE;
 
 	private static SkriptRegistration registration;
-	private static Path SCROLL_PATH;
+	private static Path SCROLL_FOLDER;
 
 	@Override
 	public void onInitialize() {
 		MOD_CONTAINER = FabricLoader.getInstance().getModContainer("scroll").orElseThrow();
+		SCROLL_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
 		try {
 			CONFIGURATION = new Configuration(this);
 			LANGUAGE = new Language(this);
@@ -70,8 +73,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		});
 		registration.register();
 
-		SCROLL_PATH = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
-		ScrollScriptLoader.loadScriptsDirectory(SCROLL_PATH.resolve("scripts"));
+		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
 	}
 
@@ -83,9 +85,14 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param arguments The arguments to be casted through the {@link String#format(String, Object...)}.
 	 * @return The found String value. Otherwise will default to English.
 	 */
-	@NotNull
+	@Nullable
 	public static String languageFormat(String key, Object... arguments) {
-		return String.format(LANGUAGE.getOrDefaultEnglish(key), arguments);
+		try {
+			return String.format(LANGUAGE.getOrDefaultEnglish(key), arguments);
+		} catch (UnknownFormatConversionException exception) {
+			printException(exception, "Potentially incorrect format in the language properties file.");
+			return null;
+		}
 	}
 
 	/**

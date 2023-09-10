@@ -10,20 +10,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.Sets;
 import com.skriptlang.scroll.script.Script;
+import com.skriptlang.scroll.utils.FileUtils;
 
 import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.log.LogEntry;
+import io.github.syst3ms.skriptparser.log.LogType;
 import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
+import io.github.syst3ms.skriptparser.util.ConsoleColors;
+import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Main class for handling loading to skript-parser.
@@ -33,6 +39,20 @@ public class ScrollScriptLoader {
 	private static final Collection<String> RESERVED_NAMES = Sets.newHashSet("configuration.scroll", "config.scroll", "languages.scroll");
 	private static final List<Script> LOADED_SCRIPTS = new ArrayList<>();
 	private static final boolean DEBUG = Scroll.CONFIGURATION.isDebug();
+	private static Path SCRIPTS_FOLDER;
+
+	public static final String DISABLED_PREFIX = "-";
+	public static final String EXTENSION = ".scroll";
+
+	/**
+	 * @return The main folder containing all the scripts.
+	 */
+	public static Path getScriptsFolder() {
+		if (SCRIPTS_FOLDER != null)
+			return SCRIPTS_FOLDER;
+		SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll").resolve("scripts"));
+		return SCRIPTS_FOLDER;
+	}
 
 	/**
 	 * Validates that the provided path is a Scroll script.
@@ -42,11 +62,14 @@ public class ScrollScriptLoader {
 	 * @throws IllegalArgumentException if the provided path was a directory.
 	 */
 	public static boolean validateScriptAt(@NotNull Path script) {
-		Validate.isTrue(!Files.isDirectory(script), Scroll.languageFormat("scripts.load.error.directory", script.toString()));
-		String fileName = script.getFileName().toString();
-		if (!fileName.endsWith(".scroll"))
+		if (Files.isDirectory(script)) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.directory", script.toString()));
 			return false;
-		if (fileName.startsWith("-"))
+		}
+		String fileName = script.getFileName().toString();
+		if (!fileName.endsWith(EXTENSION))
+			return false;
+		if (fileName.startsWith(DISABLED_PREFIX))
 			return false;
 		if (RESERVED_NAMES.stream().anyMatch(fileName::equalsIgnoreCase)) {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.name.reserved", fileName));
@@ -59,12 +82,16 @@ public class ScrollScriptLoader {
 	 * Collects all the .scroll scripts at the defined {@link Path} directory.
 	 * 
 	 * @param directory The directory path to search for .scroll files.
+	 * @param disabled If the result should only be the disabled scripts or not.
 	 * @return A collection of all the found and constructed {@link Script} within the defined path directory.
 	 * @throws IllegalArgumentException if the provided path was not a directory.
 	 */
 	@NotNull
-	public static Stream<Path> collectScriptsAt(Path directory) {
-		Validate.isTrue(Files.isDirectory(directory), Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
+	public static Stream<Path> collectScriptsAt(Path directory, boolean disabled) {
+		if (!Files.isDirectory(directory)) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
+			return Stream.empty();
+		}
 		try {
 			return Files.list(directory)
 					.filter(Objects::nonNull)
@@ -95,18 +122,14 @@ public class ScrollScriptLoader {
 	@NotNull
 	@Internal
 	static List<Script> loadScriptsDirectory(Path scriptsPath) {
-		Validate.isTrue(Files.isDirectory(scriptsPath), Scroll.language("scripts.load.internal.scripts"));
+		if (!Files.isDirectory(scriptsPath)) {
+			Scroll.LOGGER.error(Scroll.language("scripts.load.internal.scripts"));
+			return new ArrayList<>();
+		};
 		long start = System.nanoTime();
 		LOADED_SCRIPTS.clear(); // TODO proper unloading.
-		if (!Files.exists(scriptsPath)) {
-			try {
-				Files.createDirectories(scriptsPath);
-			} catch (IOException exception) {
-				Scroll.printException(exception, Scroll.languageFormat("files.create.directory.select", "/scripts", "/scroll"));
-				return new ArrayList<>();
-			}
-		}
-		List<Script> scripts = collectScriptsAt(scriptsPath)
+		SCRIPTS_FOLDER = scriptsPath;
+		List<Script> scripts = collectScriptsAt(scriptsPath, false)
 				.parallel()
 				.map(path -> {
 					List<LogEntry> entries = ScriptLoader.loadScript(path, DEBUG);
@@ -131,12 +154,38 @@ public class ScrollScriptLoader {
 	 * @throws IllegalArgumentException if the provided path was a directory.
 	 */
 	public static Optional<Script> loadScriptAt(Path path) {
-		Validate.isTrue(!Files.isDirectory(path), Scroll.languageFormat("scripts.load.error.directory", path.toString()));
+		if (Files.isDirectory(path)) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.directory", path.toString()));
+			return Optional.empty();
+		}
 		if (!validateScriptAt(path))
 			return Optional.empty();
 		LOADED_SCRIPTS.removeIf(script -> script.getPath().equals(path));
-		List<LogEntry> entries = ScriptLoader.loadScript(path, DEBUG);
-		Parser.printLogs(entries, Calendar.getInstance(), true);
+		List<LogEntry> entries;
+		try {
+			entries = CompletableFuture.supplyAsync(() -> ScriptLoader.loadScript(path, DEBUG)).get(5, TimeUnit.MINUTES);
+			for (LogEntry log : entries) {
+				ConsoleColors color = ConsoleColors.WHITE;
+				if (log.getType() == LogType.WARNING) {
+					color = ConsoleColors.YELLOW;
+				} else if (log.getType() == LogType.ERROR) {
+					color = ConsoleColors.RED;
+				} else if (log.getType() == LogType.INFO) {
+					color = ConsoleColors.BLUE;
+				} else if (log.getType() == LogType.DEBUG) {
+					color = ConsoleColors.PURPLE;
+				}
+				String CONSOLE_FORMAT = "[%tT] %s: %s%n";
+				Calendar time = Calendar.getInstance();
+				Scroll.LOGGER.info(String.format(color + CONSOLE_FORMAT + ConsoleColors.RESET, time, log.getType().name(), log.getMessage()));
+				boolean tipsEnabled = true;
+				if (tipsEnabled && log.getTip().isPresent())
+					Scroll.LOGGER.info(String.format(ConsoleColors.BLUE_BRIGHT + CONSOLE_FORMAT + ConsoleColors.RESET, time, "TIP", log.getTip().get()));
+	        }
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.loading.timeout", path.getFileName()));
+			return Optional.empty();
+		}
 		Script script = new Script(path);
 		LOADED_SCRIPTS.add(script);
 		return Optional.of(script);
@@ -150,8 +199,11 @@ public class ScrollScriptLoader {
 	 * @throws IllegalArgumentException if the provided path was not a directory.
 	 */
 	public static List<Script> loadScriptsAt(Path directory) {
-		Validate.isTrue(Files.isDirectory(directory), Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
-		return collectScriptsAt(directory)
+		if (!Files.isDirectory(directory)) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
+			return new ArrayList<>();
+		}
+		return collectScriptsAt(directory, false)
 				.map(ScrollScriptLoader::loadScriptAt)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
@@ -183,6 +235,67 @@ public class ScrollScriptLoader {
 	}
 
 	/**
+	 * Disables the provided script.
+	 * 
+	 * @param script The {@link Script} to disable.
+	 */
+	public static void disableScript(Script script) {
+		Path path = script.getPath();
+		String fileName = script.getFileName();
+		LOADED_SCRIPTS.remove(script);
+		if (!Files.exists(path)) // Was renamed
+			return;
+		try {
+			Files.move(path, SCRIPTS_FOLDER.resolve(DISABLED_PREFIX + path.getFileName()));
+		} catch (IOException exception) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.disable.failed", fileName));
+		}
+	}
+
+	/**
+	 * Disables all the provided scripts.
+	 * 
+	 * @param scripts Collection of scripts to disable.
+	 */
+	public static void disableScripts(Collection<Script> scripts) {
+		scripts.stream().forEach(ScrollScriptLoader::disableScript);
+	}
+
+	/**
+	 * Enables the provided script.
+	 * 
+	 * @param path The {@link Path} to the script to enable. Must have the disabled script prefix.
+	 * @return The {@link Script}s that loaded successfully after an enable. If the script failed to be loaded, the Optional will be empty.
+	 */
+	public static Optional<Script> enableScriptAt(Path path) {
+		if (!Files.exists(path))
+			return Optional.empty();
+		String fileName = path.getFileName().toString();
+		if (!fileName.startsWith(DISABLED_PREFIX))
+			return Optional.empty();
+		Path futurePath = SCRIPTS_FOLDER.resolve(fileName.substring(DISABLED_PREFIX.length()));
+		if (LOADED_SCRIPTS.stream().anyMatch(script -> script.getPath().equals(futurePath))) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.enable.failed", fileName));
+			return Optional.empty();
+		}
+		try {
+			return loadScriptAt(Files.move(path, futurePath));
+		} catch (IOException exception) {
+			Scroll.LOGGER.error(Scroll.languageFormat("scripts.enable.failed", fileName));
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Enables all the provided scripts.
+	 * 
+	 * @param paths Collection of paths to the scripts to enable. All scripts must have the disabled script prefix.
+	 */
+	public static void enableScriptsAt(Collection<Path> paths) {
+		paths.stream().forEach(ScrollScriptLoader::enableScriptAt);
+	}
+
+	/**
 	 * Returns an optional if the Script is currently loaded. Ignoring case.
 	 * 
 	 * @param name The name to test against. Can contain .scroll extension or not.
@@ -193,7 +306,7 @@ public class ScrollScriptLoader {
 			String fileName = script.getFileName();
 			if (fileName.equalsIgnoreCase(name))
 				return true;
-			if (fileName.substring(0, fileName.lastIndexOf(".scroll")).equalsIgnoreCase(name))
+			if (fileName.substring(0, fileName.lastIndexOf(EXTENSION)).equalsIgnoreCase(name))
 				return true;
 			return false;
 		}).findFirst();

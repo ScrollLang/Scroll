@@ -6,13 +6,10 @@ import java.nio.file.Path;
 
 import org.apache.commons.lang3.Validate;
 
-import com.skriptlang.scroll.ScrollScriptLoader;
-import com.skriptlang.scroll.language.Reloadable;
-
 /**
  * Represents a parsed and loaded Script.
  */
-public class Script implements Reloadable {
+public class Script {
 
 	private final Path path;
 
@@ -36,11 +33,6 @@ public class Script implements Reloadable {
 
 	public Path getPath() {
 		return path;
-	}
-
-	@Override
-	public boolean reload() {
-		return ScrollScriptLoader.reloadScript(this).isPresent();
 	}
 
 }
