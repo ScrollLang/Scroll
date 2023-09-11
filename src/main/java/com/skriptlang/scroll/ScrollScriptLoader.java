@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Sets;
 import com.skriptlang.scroll.script.Script;
@@ -26,9 +27,8 @@ import com.skriptlang.scroll.utils.FileUtils;
 
 import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.log.LogEntry;
-import io.github.syst3ms.skriptparser.log.LogType;
+import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
-import io.github.syst3ms.skriptparser.util.ConsoleColors;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
@@ -40,6 +40,9 @@ public class ScrollScriptLoader {
 	private static final List<Script> LOADED_SCRIPTS = new ArrayList<>();
 	private static final boolean DEBUG = Scroll.CONFIGURATION.isDebug();
 	private static Path SCRIPTS_FOLDER;
+
+	@Nullable
+	public static SkriptLogger CURRENT_LOGGER;
 
 	public static final String DISABLED_PREFIX = "-";
 	public static final String EXTENSION = ".scroll";
@@ -131,11 +134,9 @@ public class ScrollScriptLoader {
 		SCRIPTS_FOLDER = scriptsPath;
 		List<Script> scripts = collectScriptsAt(scriptsPath, false)
 				.parallel()
-				.map(path -> {
-					List<LogEntry> entries = ScriptLoader.loadScript(path, DEBUG);
-					Parser.printLogs(entries, Calendar.getInstance(), true);
-					return new Script(path);
-				})
+				.map(ScrollScriptLoader::loadScriptAt)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.collect(Collectors.toList());
 		if (scripts.isEmpty()) {
 			Scroll.LOGGER.warn(Scroll.language("scroll.no.scripts"));
@@ -163,25 +164,31 @@ public class ScrollScriptLoader {
 		LOADED_SCRIPTS.removeIf(script -> script.getPath().equals(path));
 		List<LogEntry> entries;
 		try {
-			entries = CompletableFuture.supplyAsync(() -> ScriptLoader.loadScript(path, DEBUG)).get(5, TimeUnit.MINUTES);
-			for (LogEntry log : entries) {
-				ConsoleColors color = ConsoleColors.WHITE;
-				if (log.getType() == LogType.WARNING) {
-					color = ConsoleColors.YELLOW;
-				} else if (log.getType() == LogType.ERROR) {
-					color = ConsoleColors.RED;
-				} else if (log.getType() == LogType.INFO) {
-					color = ConsoleColors.BLUE;
-				} else if (log.getType() == LogType.DEBUG) {
-					color = ConsoleColors.PURPLE;
-				}
-				String CONSOLE_FORMAT = "[%tT] %s: %s%n";
-				Calendar time = Calendar.getInstance();
-				Scroll.LOGGER.info(String.format(color + CONSOLE_FORMAT + ConsoleColors.RESET, time, log.getType().name(), log.getMessage()));
-				boolean tipsEnabled = true;
-				if (tipsEnabled && log.getTip().isPresent())
-					Scroll.LOGGER.info(String.format(ConsoleColors.BLUE_BRIGHT + CONSOLE_FORMAT + ConsoleColors.RESET, time, "TIP", log.getTip().get()));
-	        }
+			CURRENT_LOGGER = new SkriptLogger(DEBUG);
+			entries = CompletableFuture.supplyAsync(() -> ScriptLoader.loadScript(path, CURRENT_LOGGER, DEBUG)).get(5, TimeUnit.MINUTES);
+//			for (LogEntry log : entries) {
+//				ConsoleColors color = ConsoleColors.WHITE;
+//				if (log.getType() == LogType.WARNING) {
+//					color = ConsoleColors.YELLOW;
+//				} else if (log.getType() == LogType.ERROR) {
+//					color = ConsoleColors.RED;
+//				} else if (log.getType() == LogType.INFO) {
+//					color = ConsoleColors.BLUE;
+//				} else if (log.getType() == LogType.DEBUG) {
+//					color = ConsoleColors.PURPLE;
+//				}
+//				String CONSOLE_FORMAT = "[%tT] %s: %s%n";
+//				Calendar time = Calendar.getInstance();
+//				Scroll.LOGGER.info(String.format(color + CONSOLE_FORMAT + ConsoleColors.RESET, time, log.getType().name(), log.getMessage()));
+//				boolean tipsEnabled = true;
+//				if (tipsEnabled && log.getTip().isPresent())
+//					Scroll.LOGGER.info(String.format(ConsoleColors.BLUE_BRIGHT + CONSOLE_FORMAT + ConsoleColors.RESET, time, "TIP", log.getTip().get()));
+//	        }
+			CURRENT_LOGGER.finalizeLogs();
+			entries.addAll(CURRENT_LOGGER.close());
+			// TODO print to command sender if done via command.
+			Parser.printLogs(entries, Calendar.getInstance(), true);
+			CURRENT_LOGGER = null;
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.loading.timeout", path.getFileName()));
 			return Optional.empty();

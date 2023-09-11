@@ -183,13 +183,13 @@ public class SkriptRegistration {
      * Starts a registration process for a {@link PropertyExpression}
      * @param c the Expression's class
      * @param returnType the Expression's return type
-     * @param owner the owner in the pattern
      * @param property the property
+     * @param owner the owner in the pattern
      * @param <C> the Expression
      * @param <T> the Expression's return type
      * @return an {@link ExpressionRegistrar} to continue the registration process
      */
-    public <C extends PropertyExpression<T, ?>, T> ExpressionRegistrar<C, T> newPropertyExpression(Class<C> c, Class<T> returnType, String owner, String property) {
+    public <C extends PropertyExpression<?, T>, T> ExpressionRegistrar<C, T> newPropertyExpression(Class<C> c, Class<T> returnType, String property, String owner) {
         return (ExpressionRegistrar<C, T>) newExpression(c, returnType, false, PropertyExpression.composePatterns(owner, property))
                 .addData(PropertyExpression.PROPERTY_IDENTIFIER, property);
     }
@@ -198,12 +198,12 @@ public class SkriptRegistration {
      * Registers a {@link PropertyExpression}
      * @param c the Expression's class
      * @param returnType the Expression's return type
-     * @param owner the owner in the pattern
      * @param property the property
+     * @param owner the owner in the pattern
      * @param <C> the Expression
      * @param <T> the Expression's return type
      */
-    public <C extends PropertyExpression<T, ?>, T> void addPropertyExpression(Class<C> c, Class<T> returnType, String owner, String property) {
+    public <C extends PropertyExpression<?, T>, T> void addPropertyExpression(Class<C> c, Class<T> returnType, String property, String owner) {
         newPropertyExpression(c, returnType, owner, property).register();
     }
 
@@ -212,12 +212,12 @@ public class SkriptRegistration {
      * @param c the Expression's class
      * @param returnType the Expression's return type
      * @param priority the priority
-     * @param owner the owner in the pattern
      * @param property the property
+     * @param owner the owner in the pattern
      * @param <C> the Expression
      * @param <T> the Expression's return type
      */
-    public <C extends PropertyExpression<T, ?>, T> void addPropertyExpression(Class<C> c, Class<T> returnType, int priority, String owner, String property) {
+    public <C extends PropertyExpression<?, T>, T> void addPropertyExpression(Class<C> c, Class<T> returnType, int priority, String property, String owner) {
         newPropertyExpression(c, returnType, owner, property).setPriority(priority).register();
     }
 

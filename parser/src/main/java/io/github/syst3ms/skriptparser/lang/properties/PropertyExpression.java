@@ -24,7 +24,7 @@ import java.util.Objects;
  * @param <O> The type of the owner of this expression.
  * @author Mwexim
  */
-public abstract class PropertyExpression<T, O> implements Expression<T> {
+public abstract class PropertyExpression<O, T> implements Expression<T> {
     public static final String PROPERTY_IDENTIFIER = "property";
 
     private Expression<O> owner;

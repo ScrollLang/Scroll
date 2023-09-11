@@ -20,6 +20,7 @@ import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
+import io.github.syst3ms.skriptparser.log.ErrorType;
 import io.github.syst3ms.skriptparser.registration.SkriptAddon;
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
 import net.fabricmc.api.ModInitializer;
@@ -104,6 +105,63 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	@NotNull
 	public static String language(String key) {
 		return LANGUAGE.getOrDefaultEnglish(key);
+	}
+
+	/**
+	 * Allows to insert logging errors during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * The ErrorType will be set to {@link ErrorType.SEMANTIC_ERROR}
+	 * 
+	 * @param message The message to print.
+	 */
+	public static void error(String message) {
+		error(message, ErrorType.SEMANTIC_ERROR, null);
+	}
+
+	/**
+	 * Allows to insert logging errors during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * The ErrorType will be set to {@link ErrorType.SEMANTIC_ERROR}
+	 * 
+	 * @param message The message to print.
+	 * @param tip A hint to provide to the Scroll user for the error.
+	 */
+	public static void error(String message, @Nullable String tip) {
+		error(message, ErrorType.SEMANTIC_ERROR, tip);
+	}
+
+	/**
+	 * Allows to insert logging errors during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 * @param type The error type this will provide to the SkriptLogger.
+	 * @param tip A hint to provide to the Scroll user for the error.
+	 */
+	public static void error(String message, ErrorType type, @Nullable String tip) {
+		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
+			ScrollScriptLoader.CURRENT_LOGGER.error(message, type, tip);
+			return;
+		}
+		LOGGER.error(message);
+	}
+
+	/**
+	 * Allows to insert logging information during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 */
+	public static void info(String message) {
+		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
+			ScrollScriptLoader.CURRENT_LOGGER.info(message);
+			return;
+		}
+		LOGGER.info(message);
 	}
 
 	/**
