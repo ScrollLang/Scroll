@@ -34,6 +34,12 @@ gradlew runClient
 gradlew runServer
 ```
 
+### Updating your local branch of Scroll with the latest skript-parser commit
+```
+git submodule update --recursive --remote
+```
+This is assuming you executed `git submodule update --init --recursive` before, as this must be done before running this command.
+
 ### Code Conventions
 Scroll follows Skript's code conventions excluding the section about License
 
