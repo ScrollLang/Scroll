@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 
 public class Types {
 
-	static {
+	public static void register() {
 		SkriptRegistration registration = Scroll.getRegistration();
 		registration.newType(PlayerEntity.class, "player", "player@s")
 				.toStringFunction(player -> player.getName().getString())
