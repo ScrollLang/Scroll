@@ -109,7 +109,7 @@ public class ExceptionPrinter extends CommonPrinter {
 		logEx("  OS: " + System.getProperty("os.name") + " " + System.getProperty("os.arch") + " " + System.getProperty("os.version"));
 		logEx();
 		logEx("Environment: " + FabricLoader.getInstance().getEnvironmentType());
-		logEx();
+//		logEx();
 //		logEx("Current node: " + SkriptLogger.getNode());
 //		logEx("Current item: " + (item == null ? "null" : item.toString(null, true)));
 //		if (item != null && item.getTrigger() != null) {

@@ -8,6 +8,7 @@ language = "english"
 
 # All configurations relating to scroll itself.
 [scroll]
+debug = false
 
 	# Configurations relating to commands.
 	[scroll.commands]
@@ -16,3 +17,5 @@ language = "english"
 	permission-level = 0
 	# Disable the /scroll command
 	enabled = true
+	# When enabling a script, remove the disabled prefix from the command suggestions
+	remove-disabled-prefix = false

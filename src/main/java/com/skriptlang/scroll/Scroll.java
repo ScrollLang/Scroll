@@ -2,13 +2,17 @@ package com.skriptlang.scroll;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Calendar;
+import java.util.UnknownFormatConversionException;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.skriptlang.scroll.elements.Types;
 import com.skriptlang.scroll.exceptions.EmptyStacktraceException;
 import com.skriptlang.scroll.language.ScrollEvent;
 import com.skriptlang.scroll.log.ExceptionPrinter;
@@ -18,8 +22,11 @@ import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
+import io.github.syst3ms.skriptparser.log.ErrorType;
+import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.registration.SkriptAddon;
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
+import io.github.syst3ms.skriptparser.types.TypeManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -31,25 +38,32 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Scroll");
 	public static Configuration CONFIGURATION;
-	public static LanguageProperties LANGUAGE;
 	public static ModContainer MOD_CONTAINER;
+	public static Language LANGUAGE;
 
 	private static SkriptRegistration registration;
-	private static Path SCROLL_PATH;
+	private static Path SCROLL_FOLDER;
 
 	@Override
 	public void onInitialize() {
 		MOD_CONTAINER = FabricLoader.getInstance().getModContainer("scroll").orElseThrow();
+		SCROLL_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
 		try {
 			CONFIGURATION = new Configuration(this);
-			LANGUAGE = new LanguageProperties(this);
+			LANGUAGE = new Language(this);
 		} catch (IOException exception) {
 			printException(exception, "Could not load the configuration/properties files!");
 			return;
 		}
 
-		registration = new SkriptRegistration(this);
+		SkriptLogger registrationLogger = new SkriptLogger(CONFIGURATION.isDebug());
+		registration = new SkriptRegistration(this, registrationLogger);
 		Parser.init(new String[0], new String[0], new String[0], true);
+
+		// Types must be first.
+		Types.register();
+		TypeManager.register(registration);
+
 		// Note that the class scanner in the skript-parser init method above will not work as it assumes classes
 		// are in a JAR. So because of that, we have to statically initalize the classes ourselves.
 		new Reflections(
@@ -68,10 +82,9 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				e.printStackTrace();
 			}
 		});
-		registration.register();
+		Parser.printLogs(registration.register(), Calendar.getInstance(), true);
 
-		SCROLL_PATH = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
-		ScrollScriptLoader.loadScripts(SCROLL_PATH.resolve("scripts"));
+		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
 	}
 
@@ -83,9 +96,14 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param arguments The arguments to be casted through the {@link String#format(String, Object...)}.
 	 * @return The found String value. Otherwise will default to English.
 	 */
-	@NotNull
+	@Nullable
 	public static String languageFormat(String key, Object... arguments) {
-		return String.format(LANGUAGE.getOrDefaultEnglish(key), arguments);
+		try {
+			return String.format(LANGUAGE.getOrDefaultEnglish(key), arguments);
+		} catch (UnknownFormatConversionException exception) {
+			printException(exception, "Potentially incorrect format in the language properties file.");
+			return null;
+		}
 	}
 
 	/**
@@ -97,6 +115,63 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	@NotNull
 	public static String language(String key) {
 		return LANGUAGE.getOrDefaultEnglish(key);
+	}
+
+	/**
+	 * Allows to insert logging errors during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * The ErrorType will be set to {@link ErrorType.SEMANTIC_ERROR}
+	 * 
+	 * @param message The message to print.
+	 */
+	public static void error(String message) {
+		error(message, ErrorType.SEMANTIC_ERROR, null);
+	}
+
+	/**
+	 * Allows to insert logging errors during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * The ErrorType will be set to {@link ErrorType.SEMANTIC_ERROR}
+	 * 
+	 * @param message The message to print.
+	 * @param tip A hint to provide to the Scroll user for the error.
+	 */
+	public static void error(String message, @Nullable String tip) {
+		error(message, ErrorType.SEMANTIC_ERROR, tip);
+	}
+
+	/**
+	 * Allows to insert logging errors during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 * @param type The error type this will provide to the SkriptLogger.
+	 * @param tip A hint to provide to the Scroll user for the error.
+	 */
+	public static void error(String message, ErrorType type, @Nullable String tip) {
+		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
+			ScrollScriptLoader.CURRENT_LOGGER.error(message, type, tip);
+			return;
+		}
+		LOGGER.error(message);
+	}
+
+	/**
+	 * Allows to insert logging information during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 */
+	public static void info(String message) {
+		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
+			ScrollScriptLoader.CURRENT_LOGGER.info(message);
+			return;
+		}
+		LOGGER.info(message);
 	}
 
 	/**
