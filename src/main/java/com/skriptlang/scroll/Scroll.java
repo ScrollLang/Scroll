@@ -2,6 +2,7 @@ package com.skriptlang.scroll;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Calendar;
 import java.util.UnknownFormatConversionException;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.skriptlang.scroll.elements.Types;
 import com.skriptlang.scroll.exceptions.EmptyStacktraceException;
 import com.skriptlang.scroll.language.ScrollEvent;
 import com.skriptlang.scroll.log.ExceptionPrinter;
@@ -21,8 +23,10 @@ import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.log.ErrorType;
+import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.registration.SkriptAddon;
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
+import io.github.syst3ms.skriptparser.types.TypeManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -52,8 +56,14 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 			return;
 		}
 
-		registration = new SkriptRegistration(this);
+		SkriptLogger registrationLogger = new SkriptLogger(CONFIGURATION.isDebug());
+		registration = new SkriptRegistration(this, registrationLogger);
 		Parser.init(new String[0], new String[0], new String[0], true);
+
+		// Types must be first.
+		Types.register();
+		TypeManager.register(registration);
+
 		// Note that the class scanner in the skript-parser init method above will not work as it assumes classes
 		// are in a JAR. So because of that, we have to statically initalize the classes ourselves.
 		new Reflections(
@@ -72,7 +82,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				e.printStackTrace();
 			}
 		});
-		registration.register();
+		Parser.printLogs(registration.register(), Calendar.getInstance(), true);
 
 		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.

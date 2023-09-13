@@ -50,7 +50,7 @@ dependencies {
 	include(implementation('org.tomlj:tomlj:1.1.0'))
 
 	// skript-parser
-	include(implementation(project(':parser')))
+	include(implementation(project(':skript-parser')))
 }
 
 processResources {
