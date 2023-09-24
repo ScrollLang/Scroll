@@ -19,4 +19,8 @@ public class ScrollTriggerList {
 		this.triggers.addAll(Arrays.asList(triggers));
 	}
 
+	public void clear() {
+		this.triggers.clear();
+	}
+
 }

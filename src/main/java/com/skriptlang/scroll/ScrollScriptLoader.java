@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -22,10 +23,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Sets;
+import com.skriptlang.scroll.language.ScrollEvent;
 import com.skriptlang.scroll.script.Script;
 import com.skriptlang.scroll.utils.FileUtils;
 
 import io.github.syst3ms.skriptparser.Parser;
+import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.log.LogEntry;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
@@ -161,6 +164,21 @@ public class ScrollScriptLoader {
 		}
 		if (!validateScriptAt(path))
 			return Optional.empty();
+		ScriptLoader.getTriggerMap().entrySet().stream()
+				.filter(entry -> {
+					String fileName = path.getFileName().toString().replaceAll("(.+)\\..+", "$1");
+					return entry.getKey().equalsIgnoreCase(fileName);
+				})
+				.map(Entry::getValue)
+				.flatMap(List::stream)
+				.forEach(trigger -> {
+					SkriptEvent event = trigger.getEvent();
+					if (!(event instanceof ScrollEvent))
+						return;
+
+					ScrollEvent scrollEvent = (ScrollEvent) event;
+					scrollEvent.getTriggers().clear();
+				});
 		LOADED_SCRIPTS.removeIf(script -> script.getPath().equals(path));
 		List<LogEntry> entries;
 		try {
@@ -189,8 +207,11 @@ public class ScrollScriptLoader {
 			// TODO print to command sender if done via command.
 			Parser.printLogs(entries, Calendar.getInstance(), true);
 			CURRENT_LOGGER = null;
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+		} catch (InterruptedException | TimeoutException exception) {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.loading.timeout", path.getFileName()));
+			return Optional.empty();
+		} catch (ExecutionException exception) {
+			Scroll.printException(exception, Scroll.languageFormat("scripts.parse.exception", path.getFileName()));
 			return Optional.empty();
 		}
 		Script script = new Script(path);

@@ -11,6 +11,7 @@ public class DefaultConverters {
 
 	static {
 		SkriptRegistration registration = Scroll.getRegistration();
+		registration.addConverter(String.class, Text.class, string -> Optional.of(Text.literal(string)));
 		registration.addConverter(Text.class, String.class, text -> Optional.of(text.toString()));
 	}
 

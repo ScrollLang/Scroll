@@ -14,10 +14,8 @@ public class DefaultContextValues {
 
 	static {
 		SkriptRegistration registration = Scroll.getRegistration();
-//		registration.addContextValue(PlayerContext.class, PlayerEntity.class, true, "[the] [[event]( |-)]player", event -> new PlayerEntity[] {event.getPlayer()});
-//		registration.addContextValue(WorldContext.class, World.class, true, "[the] [[event]( |-)]world", event -> new World[] {event.getWorld()});
-		registration.addContextType(PlayerContext.class, PlayerEntity.class, event -> event.getPlayer(), State.PRESENT, Usage.EXPRESSION_ONLY);
-		registration.addContextType(WorldContext.class, World.class, event -> event.getWorld(), State.PRESENT, Usage.EXPRESSION_ONLY);
+		registration.addContextType(PlayerContext.class, PlayerEntity.class, event -> event.getPlayer(), State.PRESENT, Usage.EXPRESSION_OR_ALONE);
+		registration.addContextType(WorldContext.class, World.class, event -> event.getWorld(), State.PRESENT, Usage.EXPRESSION_OR_ALONE);
 	}
 
 }
