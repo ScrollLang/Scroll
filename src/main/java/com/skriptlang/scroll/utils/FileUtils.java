@@ -6,6 +6,8 @@ import java.nio.file.Path;
 
 import com.skriptlang.scroll.Scroll;
 
+import net.fabricmc.loader.api.ModContainer;
+
 public class FileUtils {
 
 	/**

@@ -50,7 +50,7 @@ public class Language implements Reloadable {
 	Properties loadLanguage() throws FileNotFoundException, IOException {
 		Files.list(modContainer.findPath("languages").orElseThrow())
 				.forEach(path -> {
-					Path language = languagesFolder.resolve(path.getFileName());
+					Path language = languagesFolder.resolve(path.getFileName().toString());
 					if (!Files.exists(language)) {
 						try {
 							Files.copy(path, language);

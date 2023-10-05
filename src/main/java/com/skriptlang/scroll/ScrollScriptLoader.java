@@ -39,10 +39,11 @@ import net.fabricmc.loader.api.FabricLoader;
  */
 public class ScrollScriptLoader {
 
+	private static Path SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/scripts"));
+
 	private static final Collection<String> RESERVED_NAMES = Sets.newHashSet("configuration.scroll", "config.scroll", "languages.scroll");
 	private static final List<Script> LOADED_SCRIPTS = new ArrayList<>();
 	private static final boolean DEBUG = Scroll.CONFIGURATION.isDebug();
-	private static Path SCRIPTS_FOLDER;
 
 	@Nullable
 	public static SkriptLogger CURRENT_LOGGER;
@@ -56,7 +57,7 @@ public class ScrollScriptLoader {
 	public static Path getScriptsFolder() {
 		if (SCRIPTS_FOLDER != null)
 			return SCRIPTS_FOLDER;
-		SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll").resolve("scripts"));
+		SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/scripts"));
 		return SCRIPTS_FOLDER;
 	}
 

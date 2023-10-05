@@ -8,5 +8,6 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+
 rootProject.name = 'Scroll'
 include 'skript-parser'
