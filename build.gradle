@@ -45,17 +45,15 @@ dependencies {
 
 	// Reflections
 	modImplementation include('org.reflections:reflections:0.10.2')
+	modImplementation include('org.javassist:javassist:3.28.0-GA')
 
 	// TOML
 	modImplementation include('org.tomlj:tomlj:1.1.0')
+	modImplementation include('org.antlr:antlr4-runtime:4.13.1')
 
 	// skript-parser
-	//modImplementation include(project(':skript-parser'))
-
-	implementation project(':skript-parser')
-	// When we use client source set seperate
+	implementation include(project(':skript-parser'))
 	//clientImplementation project(':skript-parser').sourceSets.client.output
-	include project(':skript-parser')
 
 }
 
@@ -95,14 +93,4 @@ publishing {
 
 processResources {
 	filter ReplaceTokens, tokens: ["version": project.property("version")]
-}
-
-build {
-	dependsOn shadowJar
-}
-
-shadowJar {
-	configurations = [project.configurations.include]
-	archiveVersion = project.property("version")
-	from sourceSets.client.output
 }
