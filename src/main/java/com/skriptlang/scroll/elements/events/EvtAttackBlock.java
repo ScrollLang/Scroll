@@ -122,11 +122,6 @@ public class EvtAttackBlock extends ScrollEvent {
 			return hand;
 		}
 
-		@Override
-		public String toString() {
-			return "left click on a block";
-		}
-
 	}
 
 	static {
