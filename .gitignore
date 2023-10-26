@@ -29,7 +29,7 @@ bin/
 *.DS_Store
 
 # fabric
-
+remappedSrc/
 run/
 
 # java
