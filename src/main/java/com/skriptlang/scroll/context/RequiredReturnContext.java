@@ -3,7 +3,7 @@ package com.skriptlang.scroll.context;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * An event that is required to return a result this event context.
+ * An event that is required to return a result.
  */
 public abstract class RequiredReturnContext<T> extends FabricContext {
 

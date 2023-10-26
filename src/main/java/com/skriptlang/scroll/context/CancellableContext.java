@@ -1,13 +1,11 @@
 package com.skriptlang.scroll.context;
 
+import io.github.syst3ms.skriptparser.lang.TriggerContext;
+
 /**
  * An event that can be cancelled.
  */
-public abstract class CancellableContext<T> extends FabricContext {
-
-	public CancellableContext(String name) {
-		super(name);
-	}
+public interface CancellableContext extends TriggerContext {
 
 	/**
      * Gets the cancellation state of this event. A cancelled event will not

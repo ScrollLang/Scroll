@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 import com.skriptlang.scroll.Scroll;
+import com.skriptlang.scroll.context.CancellableContext;
 import com.skriptlang.scroll.context.PlayerContext;
 import com.skriptlang.scroll.context.RequiredReturnContext;
 import com.skriptlang.scroll.context.WorldContext;
@@ -18,9 +19,6 @@ import io.github.syst3ms.skriptparser.lang.Expression;
 import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
-import io.github.syst3ms.skriptparser.registration.context.ContextValue;
-import io.github.syst3ms.skriptparser.registration.context.ContextValues;
-import io.github.syst3ms.skriptparser.types.TypeManager;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -51,13 +49,20 @@ import net.minecraft.world.World;
 @Since("1.0.0")
 public class EvtAttackBlock extends ScrollEvent {
 
+	// Required Context triggers methods. Start.
 	private final static ScrollTriggerList triggers = new ScrollTriggerList();
 
 	public static List<Trigger> getTriggersList() {
 		return triggers.getTriggers();
 	}
 
-	public static class AttackBlockContext extends RequiredReturnContext<ActionResult> implements PlayerContext, WorldContext {
+	@Override
+	public @NotNull ScrollTriggerList getTriggers() {
+		return triggers;
+	}
+	// Required Context triggers methods. End.
+
+	public static class AttackBlockContext extends RequiredReturnContext<ActionResult> implements PlayerContext, WorldContext, CancellableContext {
 
 		private ActionResult result = ActionResult.PASS;
 
@@ -76,7 +81,17 @@ public class EvtAttackBlock extends ScrollEvent {
 			this.hand = hand;
 		}
 
-		public void setResult(ActionResult result) {
+		@Override
+		public void setCancelled(boolean cancel) {
+			result = cancel ? ActionResult.FAIL : ActionResult.PASS;
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return result == ActionResult.FAIL;
+		}
+
+		public void setResult(@NotNull ActionResult result) {
 			this.result = result;
 		}
 
@@ -107,10 +122,16 @@ public class EvtAttackBlock extends ScrollEvent {
 			return hand;
 		}
 
+		@Override
+		public String toString() {
+			return "left click on a block";
+		}
+
 	}
 
 	static {
-		Scroll.addEvent(EvtAttackBlock.class, AttackBlockContext.class, "[player] (attack[ing]|left( |-)[mouse( |-)]click[ing] [on]) [a] block");
+		// TODO add support for itemtypes.
+		Scroll.addEvent("left click on/attack block", EvtAttackBlock.class, AttackBlockContext.class, "[player] (attack[ing]|left( |-)[mouse( |-)]click[ing] [on]) [a] block");
 		AttackBlockCallback.EVENT.register((player, world, hand, position, direction) -> {
 			AttackBlockContext context = new AttackBlockContext(player, world, hand, position, direction);
 			runTriggers(triggers, context);
@@ -126,11 +147,6 @@ public class EvtAttackBlock extends ScrollEvent {
 	@Override
 	public boolean check(TriggerContext context) {
 		return true;
-	}
-
-	@Override
-	public @NotNull ScrollTriggerList getTriggers() {
-		return triggers;
 	}
 
 }

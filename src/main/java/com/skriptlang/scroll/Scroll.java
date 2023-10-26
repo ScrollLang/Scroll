@@ -226,8 +226,8 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param context the {@link TriggerContext} this ScrollEvent will handle.
 	 * @param patterns the ScrollEvent patterns.
 	 */
-	public static void addEvent(Class<? extends ScrollEvent> event, Class<? extends TriggerContext> context, String... patterns) {
-		registration.newEvent(event, patterns).setHandledContexts(context).register();
+	public static void addEvent(String name, Class<? extends ScrollEvent> event, Class<? extends TriggerContext> context, String... patterns) {
+		registration.newEvent(event, patterns).setHandledContexts(context).addData("scroll-information", new ScrollEvent.Information(name)).register();
 	}
 
 	/**

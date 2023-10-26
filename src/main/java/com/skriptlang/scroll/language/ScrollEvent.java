@@ -9,6 +9,8 @@ import io.github.syst3ms.skriptparser.lang.TriggerContext;
 
 public abstract class ScrollEvent extends SkriptEvent {
 
+	public static record Information(String name) {}
+
 	/**
 	 * Every ScrollEvent must return a defined ScrollTriggerList object.
 	 * 

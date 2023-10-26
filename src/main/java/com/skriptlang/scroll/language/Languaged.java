@@ -5,7 +5,12 @@ import org.jetbrains.annotations.Nullable;
 
 import com.skriptlang.scroll.Scroll;
 
+import io.github.syst3ms.skriptparser.lang.CodeSection;
+import io.github.syst3ms.skriptparser.lang.Statement;
+import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.log.ErrorType;
+import io.github.syst3ms.skriptparser.parsing.ParseContext;
+import io.github.syst3ms.skriptparser.registration.SkriptEventInfo;
 
 /**
  * Utility class to short cut and help out interating with the Language file.
@@ -97,6 +102,41 @@ public interface Languaged {
 
 	default void info(LangNode... langs) {
 		info(languageFormat(langs));
+	}
+
+	/**
+	 * Compares all events against the present event to collect the name of the trigger.
+	 * 
+	 * @param parseContext
+	 * @return
+	 */
+	default String getEventName(ParseContext parseContext) {
+		for (CodeSection section : parseContext.getParserState().getCurrentSections()) {
+			if (!(section instanceof Trigger))
+				continue;
+			Trigger trigger = (Trigger) section;
+			for (SkriptEventInfo<?> eventInfo : Scroll.getRegistration().getEvents()) {
+				if (!eventInfo.getSyntaxClass().equals(trigger.getEvent().getClass()))
+					continue;
+				ScrollEvent.Information information = eventInfo.getData("scroll-information", ScrollEvent.Information.class);
+				if (information != null)
+					return information.name();
+			}
+		}
+		// Fallback to check the statement if the API changed.
+		for (Statement statement : parseContext.getParserState().getCurrentStatements()) {
+			if (!(statement instanceof Trigger))
+				continue;
+			Trigger trigger = (Trigger) statement;
+			for (SkriptEventInfo<?> eventInfo : Scroll.getRegistration().getEvents()) {
+				if (!eventInfo.getSyntaxClass().equals(trigger.getEvent().getClass()))
+					continue;
+				ScrollEvent.Information information = eventInfo.getData("scroll-information", ScrollEvent.Information.class);
+				if (information != null)
+					return information.name();
+			}
+		}
+		return "Unknown event (Trigger changed)";
 	}
 
 	/**
