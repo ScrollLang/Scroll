@@ -27,9 +27,14 @@ import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.registration.SkriptAddon;
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
 import io.github.syst3ms.skriptparser.types.TypeManager;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
+import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Main class for Scroll for all environments.
@@ -41,11 +46,15 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	public static ModContainer MOD_CONTAINER;
 	public static Language LANGUAGE;
 
-	private static SkriptRegistration registration;
+	private static SkriptRegistration REGISTRATION;
+	private static FabricAudiences ADVENTURE;
+	private static MinecraftServer SERVER;
+	private static EnvType ENVIRONMENT;
 	private static Path SCROLL_FOLDER;
 
 	@Override
 	public void onInitialize() {
+		ENVIRONMENT = FabricLoader.getInstance().getEnvironmentType();
 		MOD_CONTAINER = FabricLoader.getInstance().getModContainer("scroll").orElseThrow();
 		SCROLL_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
 		try {
@@ -56,13 +65,28 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 			return;
 		}
 
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+			ADVENTURE = FabricServerAudiences.of(server);
+			SERVER = server;
+		});
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			ADVENTURE = null;
+			SERVER = null;
+		});
+
 		SkriptLogger registrationLogger = new SkriptLogger(CONFIGURATION.isDebug());
-		registration = new SkriptRegistration(this, registrationLogger);
+		REGISTRATION = new SkriptRegistration(this, registrationLogger);
+	}
+
+	/**
+	 * Separated for client and server specific types to be registered before syntaxes.
+	 */
+	static void register() {
 		Parser.init(new String[0], new String[0], new String[0], true);
 
-		// Types must be first.
-		Types.register();
-		TypeManager.register(registration);
+		// Types must be before syntaxes.
+		Types.register(REGISTRATION);
+		TypeManager.register(REGISTRATION);
 
 		// Note that the class scanner in the skript-parser init method above will not work as it assumes classes
 		// are in a JAR. So because of that, we have to statically initalize the classes ourselves.
@@ -82,10 +106,44 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				e.printStackTrace();
 			}
 		});
-		Parser.printLogs(registration.register(), Calendar.getInstance(), true);
+		Parser.printLogs(REGISTRATION.register(), Calendar.getInstance(), true);
 
 		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
+	}
+
+	/**
+	 * Returns the {@link MinecraftServer} of the dedicated server. Will be client server if single player.
+	 */
+	@Nullable
+	public static MinecraftServer getMinecraftServer() {
+		return SERVER;
+	}
+
+	static <A extends FabricAudiences> void setAdventure(A adventure) {
+		Scroll.ADVENTURE = adventure;
+	}
+
+	/**
+	 * Returns the {@link FabricAudiences} for Adventure API.
+	 * Will be {@link net.kyori.adventure.platform.fabric.FabricClientAudiences} for the client and {@link FabricServerAudiences} for the server.
+	 * Cast appropriately depending on {@link #isServerEnvironment()}.
+	 */
+	@Nullable
+	@SuppressWarnings("unchecked")
+	public static <A extends FabricAudiences> A getAdventure() {
+		return (@Nullable A) ADVENTURE;
+	}
+
+	/**
+	 * @return If Scroll is loaded as a {@link EnvType#CLIENT} environment or a {@link EnvType#SERVER} environment.
+	 * <p>
+	 * Returns false if called before initalization.
+	 */
+	public static boolean isServerEnvironment() {
+		if (ENVIRONMENT == null)
+			return false;
+		return ENVIRONMENT == EnvType.SERVER;
 	}
 
 	/**
@@ -178,7 +236,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @return The main registration for Scroll syntaxes and addon syntaxes. Use this method over {@link Parser#getMainRegistration()}.
 	 */
 	public static SkriptRegistration getRegistration() {
-		return registration;
+		return REGISTRATION;
 	}
 
 	/**
@@ -227,7 +285,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param patterns the ScrollEvent patterns.
 	 */
 	public static void addEvent(String name, Class<? extends ScrollEvent> event, Class<? extends TriggerContext> context, String... patterns) {
-		registration.newEvent(event, patterns).setHandledContexts(context).addData("scroll-information", new ScrollEvent.Information(name)).register();
+		REGISTRATION.newEvent(event, patterns).setHandledContexts(context).addData("scroll-information", new ScrollEvent.Information(name)).register();
 	}
 
 	/**

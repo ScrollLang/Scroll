@@ -107,9 +107,10 @@ public interface Languaged {
 	/**
 	 * Compares all events against the present event to collect the name of the trigger.
 	 * 
-	 * @param parseContext
-	 * @return
+	 * @param parseContext The context from an init method to be used to collect the name.
+	 * @return The registered name of the trigger, otherwise null if not found.
 	 */
+	@Nullable
 	default String getEventName(ParseContext parseContext) {
 		for (CodeSection section : parseContext.getParserState().getCurrentSections()) {
 			if (!(section instanceof Trigger))
@@ -136,7 +137,7 @@ public interface Languaged {
 					return information.name();
 			}
 		}
-		return "Unknown event (Trigger changed)";
+		return null;
 	}
 
 	/**
