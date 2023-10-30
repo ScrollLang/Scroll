@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.tomlj.TomlTable;
 
@@ -85,6 +84,10 @@ public class Language implements Reloadable {
 		return properties;
 	}
 
+	/**
+	 * Reloads the currently selected language file.
+	 * Will read the main configuration node before to see if the language has changed.
+	 */
 	@Override
 	public boolean reload() {
 		TomlTable languageConfigurations = Scroll.CONFIGURATION.getLanguageSection();
@@ -116,15 +119,29 @@ public class Language implements Reloadable {
 	 */
 	public String getOrDefaultEnglish(String key) {
 		String value = Optional.ofNullable(properties.getProperty(key)).orElse(english.getProperty(key));
-		Validate.notNull(value, "The key '" + key + "' was not present in any language files.");
+		if (value == null)
+			return key;
 		return value;
 	}
 
+	/**
+	 * Returns a key from the language file, null if not found.
+	 * 
+	 * @param key The key to lookup in the language file.
+	 * @return The value of the key if found, otherwise will return null.
+	 */
 	@Nullable
 	public String get(String key) {
 		return properties.getProperty(key);
 	}
 
+	/**
+	 * Returns a key from the language file, otherwise uses the parameter provided for default value.
+	 * 
+	 * @param key The key to lookup in the language file.
+	 * @param defaultValue The default value that will be returned if no key was present in the language file.
+	 * @return The value of the key if found, otherwise the default value parameter.
+	 */
 	public String get(String key, String defaultValue) {
 		return properties.getProperty(key, defaultValue);
 	}

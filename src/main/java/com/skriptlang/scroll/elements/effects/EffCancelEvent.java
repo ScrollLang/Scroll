@@ -40,7 +40,7 @@ public class EffCancelEvent extends Effect implements Languaged {
 			if (CancellableContext.class.isAssignableFrom(context))
 				return true;
 		}
-		error(node("syntaxes.effcancelevent.cannot", getEventName(parseContext)));
+		error(parseContext, node("syntaxes.effcancelevent.cannot", getEventName(parseContext)));
 		return false;
 	}
 

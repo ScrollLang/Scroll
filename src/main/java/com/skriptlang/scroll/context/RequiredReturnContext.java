@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * An event that is required to return a result.
  */
-public abstract class RequiredReturnContext<T> extends FabricContext {
+public abstract class RequiredReturnContext<T> extends ScrollContext {
 
 	public RequiredReturnContext(String name) {
 		super(name);

@@ -1,4 +1,4 @@
-package com.skriptlang.scroll.elements.commands;
+package com.skriptlang.scroll.commands;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;

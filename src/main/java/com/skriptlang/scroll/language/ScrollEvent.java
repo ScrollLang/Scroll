@@ -1,5 +1,7 @@
 package com.skriptlang.scroll.language;
 
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
@@ -22,13 +24,24 @@ public abstract class ScrollEvent extends SkriptEvent {
 
 	/**
 	 * Shortcut for executing a context to all triggers of the ScrollEvent.
-	 * @param <C> A context class that extends TriggerContext.
 	 * 
+	 * @param <C> A context class that extends TriggerContext.
 	 * @param triggers The ScrollTriggerList belonging to the ScrollEvent.
 	 * @param context The TriggerContext to apply to the triggers.
 	 */
 	public static <C extends TriggerContext> void runTriggers(ScrollTriggerList triggers, C context) {
-		for (Trigger trigger : triggers.getTriggers())
+		runTriggers(triggers.getTriggers(), context);
+	}
+
+	/**
+	 * Shortcut for executing a context to all triggers of the ScrollEvent.
+	 * 
+	 * @param <C> A context class that extends TriggerContext.
+	 * @param triggers A ist<Trigger> belonging to the ScrollEvent with all the {@link Trigger}s.
+	 * @param context The TriggerContext to apply to the triggers.
+	 */
+	public static <C extends TriggerContext> void runTriggers(List<Trigger> triggers, C context) {
+		for (Trigger trigger : triggers)
 			Statement.runAll(trigger, context);
 	}
 

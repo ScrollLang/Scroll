@@ -21,7 +21,7 @@ import io.github.syst3ms.skriptparser.types.TypeManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandOutput;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
@@ -55,15 +55,14 @@ public class EffBroadcast extends Effect implements Languaged {
 
 	@Override
 	protected void execute(TriggerContext context) {
-		List<CommandOutput> receivers = new ArrayList<>();
+		List<ServerCommandSource> receivers = new ArrayList<>();
 		if (worlds == null) {
 			MinecraftServer server = Scroll.getMinecraftServer();
-			server.getPlayerManager().getPlayerList();
-			receivers.addAll(server.getPlayerManager().getPlayerList());
-			receivers.add(server);
+			server.getPlayerManager().getPlayerList().forEach(player -> receivers.add(player.getCommandSource()));
+			receivers.add(server.getCommandSource());
 		} else {
 			for (ServerWorld world : worlds.getArray(context))
-				receivers.addAll(world.getPlayers());
+				world.getPlayers().forEach(player -> receivers.add(player.getCommandSource()));
 		}
 
 		for (Object object : objects.getArray(context)) {

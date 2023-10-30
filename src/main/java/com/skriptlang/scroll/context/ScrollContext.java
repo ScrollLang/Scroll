@@ -5,11 +5,11 @@ import io.github.syst3ms.skriptparser.lang.TriggerContext;
 /**
  * Represents an event that comes from Fabric.
  */
-public class FabricContext implements TriggerContext {
+public class ScrollContext implements TriggerContext {
 
 	private final String name;
 
-	public FabricContext(String name) {
+	public ScrollContext(String name) {
 		this.name = name;
 	}
 

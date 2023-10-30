@@ -11,6 +11,9 @@ import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.log.ErrorType;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.registration.SkriptEventInfo;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.text.Text;
 
 /**
  * Utility class to short cut and help out interating with the Language file.
@@ -47,6 +50,15 @@ public interface Languaged {
 		return Scroll.languageFormat(key, arguments);
 	}
 
+	default Text adventure(LangNode node) {
+		MiniMessage miniMessage = MiniMessage.miniMessage();
+		FabricAudiences adventure = Scroll.getAdventure();
+		String string = languageFormat(node);
+		if (string == null)
+			return Text.literal(node.node());
+		return adventure.toNative(miniMessage.deserialize(languageFormat(node)));
+	}
+
 	/**
 	 * Quick shortcut for access the language properties file.
 	 * 
@@ -58,8 +70,8 @@ public interface Languaged {
 		return Scroll.language(key);
 	}
 
-	default void error(LangNode... langs) {
-		error(languageFormat(langs));
+	default void error(ParseContext context, LangNode... langs) {
+		error(context, languageFormat(langs));
 	}
 
 	/**
@@ -68,10 +80,11 @@ public interface Languaged {
 	 * See {@link #LOGGER} for other errors and info messages.
 	 * The ErrorType will be set to {@link ErrorType.SEMANTIC_ERROR}
 	 * 
+	 * @param context The {@link ParseContext} of the init method where this error is happening.
 	 * @param message The message to print.
 	 */
-	default void error(String message) {
-		Scroll.error(message, ErrorType.SEMANTIC_ERROR, null);
+	default void error(ParseContext context, String message) {
+		error(context, message, ErrorType.SEMANTIC_ERROR, null);
 	}
 
 	/**
@@ -80,11 +93,12 @@ public interface Languaged {
 	 * See {@link #LOGGER} for other errors and info messages.
 	 * The ErrorType will be set to {@link ErrorType.SEMANTIC_ERROR}
 	 * 
+	 * @param context The {@link ParseContext} of the init method where this error is happening.
 	 * @param message The message to print.
 	 * @param tip A hint to provide to the Scroll user for the error.
 	 */
-	default void error(String message, @Nullable String tip) {
-		Scroll.error(message, ErrorType.SEMANTIC_ERROR, tip);
+	default void error(ParseContext context, String message, @Nullable String tip) {
+		error(context, message, ErrorType.SEMANTIC_ERROR, tip);
 	}
 
 	/**
@@ -92,16 +106,29 @@ public interface Languaged {
 	 * Use this method for script parsing related errors.
 	 * See {@link #LOGGER} for other errors and info messages.
 	 * 
+	 * @param context The {@link ParseContext} of the init method where this error is happening.
 	 * @param message The message to print.
 	 * @param type The error type this will provide to the SkriptLogger.
 	 * @param tip A hint to provide to the Scroll user for the error.
 	 */
-	default void error(String message, ErrorType type, @Nullable String tip) {
+	default void error(ParseContext context, String message, ErrorType type, @Nullable String tip) {
+		// May need ParseContext in the future. It's forced to future proof this node.
 		Scroll.error(message, type, tip);
 	}
 
 	default void info(LangNode... langs) {
 		info(languageFormat(langs));
+	}
+
+	/**
+	 * Allows to insert logging information during parse time of Scroll scripts.
+	 * Use this method for script parsing related errors.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 */
+	default void info(String message) {
+		Scroll.info(message);
 	}
 
 	/**
@@ -138,17 +165,6 @@ public interface Languaged {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Allows to insert logging information during parse time of Scroll scripts.
-	 * Use this method for script parsing related errors.
-	 * See {@link #LOGGER} for other errors and info messages.
-	 * 
-	 * @param message The message to print.
-	 */
-	default void info(String message) {
-		Scroll.info(message);
 	}
 
 }

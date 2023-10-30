@@ -74,7 +74,7 @@ public class ExprName extends PropertyExpression<Object, Text> implements Langua
 		if (!type.supportsClassType(returnType)) {
 			Type<?> type = TypeManager.getByClass(returnType).orElseThrow();
 			String typeString = type.toString().toLowerCase(Locale.ENGLISH);
-			error(node("syntaxes.exprname.cannot", type.getBaseName(), typeString), node("syntaxes.exprname.cannot.tip", typeString));
+			error(parseContext, node("syntaxes.exprname.cannot", type.getBaseName(), typeString), node("syntaxes.exprname.cannot.tip", typeString));
 			return false;
 		}
 		return super.init(expressions, matchedPattern, parseContext);

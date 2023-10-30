@@ -50,13 +50,19 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	private static FabricAudiences ADVENTURE;
 	private static MinecraftServer SERVER;
 	private static EnvType ENVIRONMENT;
+	private static Path GAME_DIRECTORY;
+	private static Path ADDONS_FOLDER;
 	private static Path SCROLL_FOLDER;
 
 	@Override
 	public void onInitialize() {
-		ENVIRONMENT = FabricLoader.getInstance().getEnvironmentType();
-		MOD_CONTAINER = FabricLoader.getInstance().getModContainer("scroll").orElseThrow();
-		SCROLL_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll"));
+		FabricLoader loader = FabricLoader.getInstance();
+		GAME_DIRECTORY = loader.getGameDir();
+		ENVIRONMENT = loader.getEnvironmentType();
+		MOD_CONTAINER = loader.getModContainer("scroll").orElseThrow();
+		SCROLL_FOLDER = FileUtils.getOrCreateDir(GAME_DIRECTORY.resolve("scroll"));
+		ADDONS_FOLDER = FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("addons"));
+
 		try {
 			CONFIGURATION = new Configuration(this);
 			LANGUAGE = new Language(this);
@@ -91,6 +97,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		// Note that the class scanner in the skript-parser init method above will not work as it assumes classes
 		// are in a JAR. So because of that, we have to statically initalize the classes ourselves.
 		new Reflections(
+				"com.skriptlang.scroll.commands",
 				"com.skriptlang.scroll.elements",
 				"io.github.syst3ms.skriptparser.expressions",
 				"io.github.syst3ms.skriptparser.effects",
@@ -256,6 +263,13 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	}
 
 	/**
+	 * @return Returns the path to the addons folder.
+	 */
+	public Path getAddonsFolder() {
+		return ADDONS_FOLDER;
+	}
+
+	/**
 	 * Non static method for getting the Logger.
 	 * 
 	 * @return The {@link Logger} of Scroll.
@@ -274,9 +288,6 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		scrollEvent.getTriggers().addTriggers(trigger);
 	}
 
-	@Override
-    public void finishedLoading() {}
-
 	/**
 	 * Registers a {@link ScrollEvent}
 	 * 
@@ -285,6 +296,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param patterns the ScrollEvent patterns.
 	 */
 	public static void addEvent(String name, Class<? extends ScrollEvent> event, Class<? extends TriggerContext> context, String... patterns) {
+		// TODO add a check for same names.
 		REGISTRATION.newEvent(event, patterns).setHandledContexts(context).addData("scroll-information", new ScrollEvent.Information(name)).register();
 	}
 

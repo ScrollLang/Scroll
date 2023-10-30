@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Sets;
+import com.skriptlang.scroll.commands.CommandManager;
 import com.skriptlang.scroll.language.ScrollEvent;
 import com.skriptlang.scroll.script.Script;
 import com.skriptlang.scroll.utils.FileUtils;
@@ -41,15 +42,22 @@ public class ScrollScriptLoader {
 
 	private static Path SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/scripts"));
 
-	private static final Collection<String> RESERVED_NAMES = Sets.newHashSet("configuration.scroll", "config.scroll", "languages.scroll");
+	private static final Collection<String> RESERVED_NAMES = Sets.newHashSet("configuration.scroll", "config.scroll", "languages.scroll", "language.scroll");
 	private static final List<Script> LOADED_SCRIPTS = new ArrayList<>();
 	private static final boolean DEBUG = Scroll.CONFIGURATION.isDebug();
+
+	public static final String DISABLED_PREFIX = "-";
+	public static final String EXTENSION = ".scroll";
 
 	@Nullable
 	public static SkriptLogger CURRENT_LOGGER;
 
-	public static final String DISABLED_PREFIX = "-";
-	public static final String EXTENSION = ".scroll";
+	@Nullable
+	private static Script CURRENT_SCRIPT;
+
+	public static Script getCurrentlyLoadingScript() {
+		return CURRENT_SCRIPT;
+	}
 
 	/**
 	 * @return The main folder containing all the scripts.
@@ -165,6 +173,16 @@ public class ScrollScriptLoader {
 		}
 		if (!validateScriptAt(path))
 			return Optional.empty();
+		Script script = LOADED_SCRIPTS.stream()
+				.filter(existing -> existing.getPath().equals(path))
+				.map(existing -> {
+					CommandManager.unregisterAll(existing);
+					return existing;
+				})
+				.findFirst()
+				.orElse(new Script(path));
+		LOADED_SCRIPTS.remove(script);
+		CURRENT_SCRIPT = script;
 		ScriptLoader.getTriggerMap().entrySet().stream()
 				.filter(entry -> {
 					String fileName = path.getFileName().toString().replaceAll("(.+)\\..+", "$1");
@@ -180,7 +198,6 @@ public class ScrollScriptLoader {
 					ScrollEvent scrollEvent = (ScrollEvent) event;
 					scrollEvent.getTriggers().clear();
 				});
-		LOADED_SCRIPTS.removeIf(script -> script.getPath().equals(path));
 		List<LogEntry> entries;
 		try {
 			CURRENT_LOGGER = new SkriptLogger(DEBUG);
@@ -215,7 +232,7 @@ public class ScrollScriptLoader {
 			Scroll.printException(exception, Scroll.languageFormat("scripts.parse.exception", path.getFileName()));
 			return Optional.empty();
 		}
-		Script script = new Script(path);
+		CURRENT_SCRIPT = null;
 		LOADED_SCRIPTS.add(script);
 		return Optional.of(script);
 	}
