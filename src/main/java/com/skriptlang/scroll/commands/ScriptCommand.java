@@ -20,7 +20,6 @@ import io.github.syst3ms.skriptparser.lang.Statement;
 import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.lang.entries.LiteralLoader;
-import io.github.syst3ms.skriptparser.lang.entries.OptionLoader;
 import io.github.syst3ms.skriptparser.lang.entries.SectionConfiguration;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
@@ -82,13 +81,14 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 
 	}
 
-	private final SectionConfiguration configuration = new SectionConfiguration()
-			.addLoader(new LiteralLoader<Text>(Text.class, false, "permission message", true))
-			.addLoader(new LiteralLoader<Number>(Number.class, false, "permission", true))
-			.addLoader(new LiteralLoader<Boolean>(Boolean.class, false, "client", true))
-			.addLoader(new OptionLoader(true, "aliases", true))
-			.addLoader(new OptionLoader(false, "usage", true))
-			.addSection("trigger");
+	private final SectionConfiguration configuration = new SectionConfiguration.Builder()
+			.addLoader(new LiteralLoader<Text>("permission message", Text.class, false, true))
+			.addLoader(new LiteralLoader<Number>("permission", Number.class, false, true))
+			.addLoader(new LiteralLoader<Boolean>("client", Boolean.class, false, true))
+			.addOptionalList("aliases")
+			.addOptionalKey("usage")
+			.addSection("trigger")
+			.build();
 
 	private final List<String> aliases = new ArrayList<>();
 	private Text permissionMessage;
