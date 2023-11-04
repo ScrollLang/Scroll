@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public class Types {
 
 	public static void register(SkriptRegistration registration) {
-		registration.newType(Entity.class, "entity", "entit@ies")
+		registration.newType(Entity.class, "entity", "entit@y@ies")
 				.toStringFunction(entity -> entity.getName().toString())
 				.defaultChanger(DefaultChangers.ENTITY)
 				.register();
@@ -37,7 +37,7 @@ public class Types {
 				.defaultChanger(DefaultChangers.PLAYER)
 				.register();
 
-		registration.newType(LivingEntity.class, "livingentity", "living[ ]entit@ies")
+		registration.newType(LivingEntity.class, "livingentity", "livingEntit@y@ies")
 				.toStringFunction(entity -> entity.getName().getString())
 				.defaultChanger(DefaultChangers.ENTITY)
 				.register();
@@ -55,8 +55,8 @@ public class Types {
 				.toStringFunction(vector -> vector.getX() + "," + vector.getY() + "," + vector.getZ())
 				.register();
 
-		registration.newType(CommandSource.class, "commandsource", "command[ ]source@s").register();
-		registration.newType(ServerCommandSource.class, "servercommandsource", "server[ ]command[ ]source@s")
+		registration.newType(CommandSource.class, "commandsource", "commandSource@s").register();
+		registration.newType(ServerCommandSource.class, "servercommandsource", "serverCommandSource@s")
 				.toStringFunction(source -> {
 					if (source.getPlayer() != null)
 						return source.getPlayer().getName().toString();

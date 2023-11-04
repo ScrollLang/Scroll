@@ -1,12 +1,17 @@
 package com.skriptlang.scroll.commands;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.RootCommandNode;
 import com.skriptlang.scroll.Scroll;
-import com.skriptlang.scroll.commands.ScriptCommand.CommandContext;
+import com.skriptlang.scroll.commands.ScriptCommand.ScrollCommandContext;
+import com.skriptlang.scroll.commands.arguments.CommandParameter;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,19 +24,30 @@ public class ServerCommandInitalizer implements CommandRegistrar {
 	public void register(Command command) {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			root = dispatcher.getRoot();
-			dispatcher.register(literal(command.name()).executes(context -> {
-				CommandContext commandContext = new ScriptCommand.CommandContext(context.getSource());
-				if (environment.dedicated) { // Only permission checks on the server.
-					ServerCommandSource source = context.getSource();
-					if (command.permission() >= 0 && !source.hasPermissionLevel(command.permission())) {
-						source.sendError(command.permissionMessage());
-						commandContext.setReturnCode(-1);
+			com.mojang.brigadier.Command<ServerCommandSource> execute = new com.mojang.brigadier.Command<>() {
+				@Override
+				public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+					ScrollCommandContext<ServerCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<ServerCommandSource>(context);
+					if (environment.dedicated) { // Only permission checks on the server.
+						ServerCommandSource source = context.getSource();
+						if (command.getPermission() >= 0 && !source.hasPermissionLevel(command.getPermission())) {
+							source.sendError(command.getPermissionMessage());
+							commandContext.setReturnCode(-1);
+						}
 					}
+					command.fill(commandContext);
+					// We still want to call the command context even if the command will be cancelled represented by a negative number. ScriptCommand handles not calling the trigger.
+					ScriptCommand.runTriggers(ScriptCommand.getTriggersList(), commandContext);
+					return commandContext.getReturnCode();
 				}
-				// We still want to call the command context even if the command will be cancelled represented by a negative number. ScriptCommand handles not calling the trigger.
-				ScriptCommand.runTriggers(ScriptCommand.getTriggersList(), commandContext);
-				return commandContext.getReturnCode();
-			}));
+			};
+			LiteralArgumentBuilder<ServerCommandSource> mainNode = literal(command.getName());
+			if (!command.getParameters().isEmpty()) {
+				for (CommandParameter<?> argument : command.getParameters()) {
+					mainNode.then(argument(argument.getIdentifier(), TextArgumentType.text()).executes(execute));
+				}
+			}
+			dispatcher.register(mainNode.executes(execute));
 		});
 	}
 

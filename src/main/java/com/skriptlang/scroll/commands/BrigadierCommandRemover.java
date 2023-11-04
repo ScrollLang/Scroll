@@ -47,13 +47,13 @@ public class BrigadierCommandRemover {
 	public void removeCommand(Command command, RootCommandNode<?> root) {
 		Map<String, ?> arguments = getArguments(root);
 		if (arguments != null)
-			remove(command.name(), arguments);
+			remove(command.getName(), arguments);
 		Map<String, ?> children = getChildren(root);
 		if (children != null)
-			remove(command.name(), children);
+			remove(command.getName(), children);
 		Map<String, ?> literals = getLiterals(root);
 		if (literals != null)
-			remove(command.name(), literals);
+			remove(command.getName(), literals);
 	}
 
 	private void remove(String name, Map<String, ?> map) {

@@ -10,11 +10,11 @@ import net.minecraft.client.network.ClientPlayerEntity;
 public class ClientTypes {
 
 	public static void register(SkriptRegistration registration) {
-		registration.newType(ClientPlayerEntity.class, "client player", "client[[ ]player]@s")
+		registration.newType(ClientPlayerEntity.class, "client player", "clientPlayer@s")
 				.toStringFunction(player -> player.getDisplayName().toString())
 				.defaultChanger(DefaultChangers.PLAYER)
 				.register();
-		registration.newType(FabricClientCommandSource.class, "client command source", "client[ ]source[ ]command@s")
+		registration.newType(FabricClientCommandSource.class, "client command source", "clientSourceCommand@s")
 				.toStringFunction(source -> source.getPlayer().getDisplayName().toString())
 				.register();
 	}

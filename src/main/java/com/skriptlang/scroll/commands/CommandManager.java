@@ -37,9 +37,9 @@ public class CommandManager {
 	 */
 	public static boolean contains(String input) {
 		for (Command command : commands.values()) {
-			if (command.name().equalsIgnoreCase(input))
+			if (command.getName().equalsIgnoreCase(input))
 				return true;
-			if (command.aliases().stream().anyMatch(input::equalsIgnoreCase))
+			if (command.getAliases().stream().anyMatch(input::equalsIgnoreCase))
 				return true;
 		}
 		return false;
@@ -52,9 +52,9 @@ public class CommandManager {
 	 * @return true if there was already a command or aliases under the input name.
 	 */
 	public static boolean contains(Command command) {
-		if (contains(command.name()))
+		if (contains(command.getName()))
 			return true;
-		if (command.aliases().stream().anyMatch(CommandManager::contains))
+		if (command.getAliases().stream().anyMatch(CommandManager::contains))
 			return true;
 		if (commands.values().contains(command))
 			return true;
@@ -85,7 +85,7 @@ public class CommandManager {
 
 	public static void unregisterAll(Script script) {
 		for (Command command : commands.get(script)) {
-			System.out.println("made it here " + command.name());
+			System.out.println("made it here " + command.getName());
 			if (command.isClientSided()) {
 				if (clientCommandRegistrar == null)
 					continue;

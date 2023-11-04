@@ -116,6 +116,14 @@ public interface Languaged {
 		Scroll.error(message, type, tip);
 	}
 
+	default void warning(ParseContext context, LangNode... langs) {
+		warning(context, languageFormat(langs), null);
+	}
+
+	default void warning(ParseContext context, String message, @Nullable String tip) {
+		context.getLogger().warn(message, tip);
+	}
+
 	default void info(LangNode... langs) {
 		info(languageFormat(langs));
 	}
