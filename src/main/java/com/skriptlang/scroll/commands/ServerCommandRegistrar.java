@@ -15,8 +15,19 @@ import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
-public class ServerCommandInitalizer implements CommandRegistrar {
+public class ServerCommandRegistrar implements CommandRegistrar<ServerCommandSource> {
+
+	private static final ServerCommandRegistrar registrar = new ServerCommandRegistrar();
+
+	static {
+		try {
+			CommandManager.setServerCommandInitalizer(registrar);
+		} catch (IllegalAccessException e) {
+			assert false;
+		}
+	}
 
 	private RootCommandNode<ServerCommandSource> root;
 
@@ -27,7 +38,7 @@ public class ServerCommandInitalizer implements CommandRegistrar {
 			com.mojang.brigadier.Command<ServerCommandSource> execute = new com.mojang.brigadier.Command<>() {
 				@Override
 				public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-					ScrollCommandContext<ServerCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<ServerCommandSource>(context);
+					ScrollCommandContext<ServerCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<ServerCommandSource>(context, registrar);
 					if (environment.dedicated) { // Only permission checks on the server.
 						ServerCommandSource source = context.getSource();
 						if (command.getPermission() >= 0 && !source.hasPermissionLevel(command.getPermission())) {
@@ -57,6 +68,11 @@ public class ServerCommandInitalizer implements CommandRegistrar {
 		PlayerManager playerManager = Scroll.getMinecraftServer().getPlayerManager();
 		for (ServerPlayerEntity player : playerManager.getPlayerList())
 			playerManager.sendCommandTree(player);
+	}
+
+	@Override
+	public void sendFeedback(ServerCommandSource source, Text feedback) {
+		source.sendFeedback(() -> feedback, false);
 	}
 
 //	private static void reloadServerDispatcher(ServerPlayerEntity player) {

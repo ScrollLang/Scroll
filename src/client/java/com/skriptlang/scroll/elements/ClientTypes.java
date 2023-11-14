@@ -10,7 +10,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 public class ClientTypes {
 
 	public static void register(SkriptRegistration registration) {
-		registration.newType(ClientPlayerEntity.class, "client player", "clientPlayer@s")
+		registration.newType(ClientPlayerEntity.class, "client player", "player")
 				.toStringFunction(player -> player.getDisplayName().toString())
 				.defaultChanger(DefaultChangers.PLAYER)
 				.register();

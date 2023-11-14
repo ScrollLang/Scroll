@@ -33,9 +33,7 @@ import io.github.syst3ms.skriptparser.lang.entries.SectionConfiguration;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.parsing.ParserState;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 public class ScriptCommand extends ScrollEvent implements Languaged {
@@ -64,16 +62,30 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 	 */
 	public static class ScrollCommandContext<T extends CommandSource> extends ScrollContext {
 
+		private final CommandRegistrar<T> registrar;
 		private final CommandContext<T> context;
 		private int returnCode = 0;
 
-		public ScrollCommandContext(CommandContext<T> context) {
+		public ScrollCommandContext(CommandContext<T> context, CommandRegistrar<T> registrar) {
 			super("command");
+			this.registrar = registrar;
 			this.context = context;
 		}
 
 		public CommandContext<T> getCommandContext() {
 			return context;
+		}
+
+		/**
+		 * @return the registrar for either the Server or Client.
+		 */
+		public CommandRegistrar<T> getCommandRegistrar() {
+			return registrar;
+		}
+
+		@SuppressWarnings("unchecked")
+		public void sendFeedback(CommandSource source, Text feedback) {
+			registrar.sendFeedback((T) source, feedback);
 		}
 
 		/**
@@ -213,24 +225,19 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean check(TriggerContext context) {
 		if (!(context instanceof ScrollCommandContext))
 			return false;
 		ScrollCommandContext<?> scrollCommandContext = (ScrollCommandContext<?>) context;
-		CommandContext<?> commandContext = scrollCommandContext.getCommandContext();
+		CommandContext<CommandSource> commandContext = (CommandContext<CommandSource>) scrollCommandContext.getCommandContext();
 		for (CommandParameter<?> argument : command.getParameters()) {
 			if (!argument.isOptional()) { // Check for required arguments.
 				try {
 					commandContext.getArgument(argument.getIdentifier(), Text.class);
 				} catch (IllegalArgumentException incorrect) {
-					Object source = commandContext.getSource();
-					if (source instanceof FabricClientCommandSource clientSource) {
-						clientSource.sendFeedback(command.getUsage());
-						return false;
-					} else if (source instanceof ServerCommandSource serverSource) {
-						serverSource.sendFeedback(() -> command.getUsage(), false);
-						return false;
-					}
+					scrollCommandContext.sendFeedback(commandContext.getSource(), permissionMessage);
+					return false;
 				}
 			}
 		}

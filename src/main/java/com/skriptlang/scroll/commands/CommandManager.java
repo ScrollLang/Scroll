@@ -9,14 +9,20 @@ import com.skriptlang.scroll.script.Script;
 
 public class CommandManager {
 
-	private static final CommandRegistrar serverCommandRegistrar = new ServerCommandInitalizer();
+	private static CommandRegistrar<?> serverCommandRegistrar = new ServerCommandRegistrar();
 	private static final Multimap<Script, Command> commands = HashMultimap.create();
-	private static CommandRegistrar clientCommandRegistrar;
+	private static CommandRegistrar<?> clientCommandRegistrar;
 
-	static void setClientCommandInitalizer(CommandRegistrar clientCommandRegistrar) throws IllegalAccessException {
+	static void setClientCommandInitalizer(CommandRegistrar<?> clientCommandRegistrar) throws IllegalAccessException {
 		if (clientCommandRegistrar != null)
 			throw new IllegalAccessException(Scroll.languageFormat("scroll.commands.api.client.registrar"));
 		CommandManager.clientCommandRegistrar = clientCommandRegistrar;
+	}
+
+	static void setServerCommandInitalizer(CommandRegistrar<?> serverCommandRegistrar) throws IllegalAccessException {
+		if (serverCommandRegistrar != null)
+			throw new IllegalAccessException(Scroll.languageFormat("scroll.commands.api.server.registrar"));
+		CommandManager.serverCommandRegistrar = serverCommandRegistrar;
 	}
 
 	/**

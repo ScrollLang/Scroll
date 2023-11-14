@@ -16,12 +16,15 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
-public class ClientCommandInitalizer implements CommandRegistrar, Languaged {
+public class ClientCommandRegistrar implements CommandRegistrar<FabricClientCommandSource>, Languaged {
+
+	private static final ClientCommandRegistrar registrar = new ClientCommandRegistrar();
 
 	static {
 		try {
-			CommandManager.setClientCommandInitalizer(new ClientCommandInitalizer());
+			CommandManager.setClientCommandInitalizer(registrar);
 		} catch (IllegalAccessException e) {
 			assert false;
 		}
@@ -32,7 +35,7 @@ public class ClientCommandInitalizer implements CommandRegistrar, Languaged {
 		com.mojang.brigadier.Command<FabricClientCommandSource> execute = new com.mojang.brigadier.Command<>() {
 			@Override
 			public int run(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
-				ScrollCommandContext<FabricClientCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<FabricClientCommandSource>(context);
+				ScrollCommandContext<FabricClientCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<FabricClientCommandSource>(context, registrar);
 				command.fill(commandContext);
 				// We still want to call the command context even if the command will be cancelled represented by a negative number. ScriptCommand handles not calling the trigger.
 				ScriptCommand.runTriggers(ScriptCommand.getTriggersList(), commandContext);
@@ -55,6 +58,11 @@ public class ClientCommandInitalizer implements CommandRegistrar, Languaged {
 		PlayerManager playerManager = Scroll.getMinecraftServer().getPlayerManager();
 		for (ServerPlayerEntity player : playerManager.getPlayerList())
 			playerManager.sendCommandTree(player);
+	}
+
+	@Override
+	public void sendFeedback(FabricClientCommandSource source, Text feedback) {
+		source.sendFeedback(feedback);
 	}
 
 }
