@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
@@ -128,12 +127,12 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 	@Override
 	public List<Statement> loadSection(FileSection section, ParserState parserState, SkriptLogger logger) {
 		configuration.loadConfiguration(null, section, parserState, logger);
-		Optional.ofNullable(configuration.getStringList("aliases")).ifPresent(list -> Arrays.stream(list).forEach(aliases -> this.aliases.add(aliases)));
-		Optional.ofNullable(configuration.getValue("permission message", Text.class)).ifPresent(permissionMessage -> this.permissionMessage = permissionMessage);
-		Optional.ofNullable(configuration.getValue("permission", Number.class)).ifPresent(permission -> this.permission = permission.intValue());
-		Optional.ofNullable(configuration.getValue("client", Boolean.class)).ifPresent(client -> this.client = client);
-		Optional.ofNullable(configuration.getValue("usage", Text.class)).ifPresent(usage -> this.usage = usage);
-		return configuration.getSection("trigger").getItems();
+		configuration.getStringList("aliases").ifPresent(list -> Arrays.stream(list).forEach(aliases -> this.aliases.add(aliases)));
+		configuration.getValue("permission message", Text.class).ifPresent(permissionMessage -> this.permissionMessage = permissionMessage);
+		configuration.getValue("permission", Number.class).ifPresent(permission -> this.permission = permission.intValue());
+		configuration.getValue("client", Boolean.class).ifPresent(client -> this.client = client);
+		configuration.getValue("usage", Text.class).ifPresent(usage -> this.usage = usage);
+		return configuration.getSection("trigger").get().getItems();
 	}
 
 	private Command command;

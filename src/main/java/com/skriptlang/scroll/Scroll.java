@@ -47,12 +47,13 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	public static Language LANGUAGE;
 
 	private static SkriptRegistration REGISTRATION;
-	private static FabricAudiences ADVENTURE;
-	private static MinecraftServer SERVER;
 	private static EnvType ENVIRONMENT;
 	private static Path GAME_DIRECTORY;
 	private static Path ADDONS_FOLDER;
 	private static Path SCROLL_FOLDER;
+
+	static FabricAudiences ADVENTURE;
+	static MinecraftServer SERVER;
 
 	@Override
 	public void onInitialize() {
