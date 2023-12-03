@@ -60,6 +60,7 @@ public class ScrollCommand implements Languaged {
 			CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 				final LiteralCommandNode<ServerCommandSource> scroll = dispatcher.register(literal("sc")
 						.requires(source -> !environment.dedicated || source.hasPermissionLevel(PERMISSION_LEVEL) || !source.isExecutedByPlayer())
+						.executes(ScrollCommand::noArguments)
 						.then(literal("reload")
 							.then(argument("file", word())
 								.suggests(RELOAD_SUGGESTS)
@@ -92,7 +93,7 @@ public class ScrollCommand implements Languaged {
 												}
 											} catch (Exception e) {
 												Scroll.LOGGER.info("There was an error");
-												Scroll.printException(e, "wat");
+												Scroll.printException(e);
 											}
 											break;
 									}
@@ -128,13 +129,22 @@ public class ScrollCommand implements Languaged {
 										}
 										return 0;
 									})))
-						.executes(context -> { // No arguments
-							context.getSource().sendMessage(Text.literal("No arguments TODO"));
-							return 0;
-						}));
-				dispatcher.register(literal("scroll").redirect(scroll));
+						);
+				dispatcher.register(literal("scroll").executes(ScrollCommand::noArguments).redirect(scroll));
 			});
 		}
+	}
+
+	/**
+	 * Method that is called when no arguments are given.
+	 * This exists because the redirect does no respect no arguments of the redirected.
+	 * 
+	 * @param context The context used from the command.
+	 * @return error code
+	 */
+	private static int noArguments(CommandContext<ServerCommandSource> context) {
+		context.getSource().sendMessage(Scroll.adventure("scroll.command.no.arguments", Scroll.MOD_CONTAINER.getMetadata().getVersion()));
+		return 0;
 	}
 
 	private static Stream<String> collectDisabledScripts() {

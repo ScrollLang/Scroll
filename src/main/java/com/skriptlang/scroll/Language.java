@@ -26,7 +26,7 @@ import net.fabricmc.loader.api.ModContainer;
 public class Language implements Reloadable {
 
 	private static final Path languagesFolder = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/languages"));
-	private static final Pattern OTHER_NODE_PATTERN = Pattern.compile("\\{?<.*?>}?");
+	private static final Pattern OTHER_NODE_PATTERN = Pattern.compile("\\{(.*?)\\}");
 	private final ModContainer modContainer;
 
 	private Properties properties;
@@ -125,14 +125,12 @@ public class Language implements Reloadable {
 		if (value == null)
 			return key;
 		Matcher matcher = OTHER_NODE_PATTERN.matcher(value);
-		if (matcher.matches()) {
-			value = matcher.replaceAll(match -> {
-				String group = match.group();
-				if (group.equalsIgnoreCase(key)) // Avoid recursion.
-					return group;
-				return getOrDefaultEnglish(group);
-			});
-		}
+		value = matcher.replaceAll(match -> {
+			String group = match.group(1);
+			if (group.equalsIgnoreCase(key)) // Avoid recursion.
+				return group;
+			return getOrDefaultEnglish(group);
+		});
 		return value;
 	}
 
