@@ -8,6 +8,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.Nullable;
 import org.tomlj.TomlTable;
@@ -24,6 +26,7 @@ import net.fabricmc.loader.api.ModContainer;
 public class Language implements Reloadable {
 
 	private static final Path languagesFolder = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/languages"));
+	private static final Pattern OTHER_NODE_PATTERN = Pattern.compile("\\{?<.*?>}?");
 	private final ModContainer modContainer;
 
 	private Properties properties;
@@ -121,6 +124,15 @@ public class Language implements Reloadable {
 		String value = Optional.ofNullable(properties.getProperty(key)).orElse(english.getProperty(key));
 		if (value == null)
 			return key;
+		Matcher matcher = OTHER_NODE_PATTERN.matcher(value);
+		if (matcher.matches()) {
+			value = matcher.replaceAll(match -> {
+				String group = match.group();
+				if (group.equalsIgnoreCase(key)) // Avoid recursion.
+					return group;
+				return getOrDefaultEnglish(group);
+			});
+		}
 		return value;
 	}
 

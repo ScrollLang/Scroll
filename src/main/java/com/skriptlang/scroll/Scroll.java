@@ -34,7 +34,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.Text;
 
 /**
  * Main class for Scroll for all environments.
@@ -170,6 +172,15 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 			printException(exception, "Potentially incorrect format in the language properties file.");
 			return null;
 		}
+	}
+
+	public static Text adventure(String node, Object... arguments) {
+		MiniMessage miniMessage = MiniMessage.miniMessage();
+		FabricAudiences adventure = Scroll.getAdventure();
+		String string = languageFormat(node, arguments);
+		if (string == null)
+			return Text.literal(node);
+		return adventure.toNative(miniMessage.deserialize(string));
 	}
 
 	/**

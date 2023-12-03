@@ -1,5 +1,6 @@
 package com.skriptlang.scroll.commands;
 
+import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -7,8 +8,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-
-import static com.mojang.brigadier.arguments.StringArgumentType.word;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -18,6 +17,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.skriptlang.scroll.Scroll;
 import com.skriptlang.scroll.ScrollScriptLoader;
+import com.skriptlang.scroll.language.Languaged;
 import com.skriptlang.scroll.script.Script;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -28,7 +28,7 @@ import net.minecraft.text.Text;
 /**
  * The main command class for handling the /scroll command.
  */
-public class ScrollCommand {
+public class ScrollCommand implements Languaged {
 
 	private static final boolean REMOVE_DISABLED_PREFIX = Scroll.CONFIGURATION.getCommandSection().getBoolean("scroll.commands.remove-disabled-prefix", () -> false);
 	private static final boolean HIDE_EXTENSIONS = Scroll.CONFIGURATION.getCommandSection().getBoolean("scroll.commands.hide-extensions", () -> true);
@@ -59,7 +59,7 @@ public class ScrollCommand {
 		if (Scroll.CONFIGURATION.getCommandSection().getBoolean("scroll.commands.enabled", () -> true)) {
 			CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 				final LiteralCommandNode<ServerCommandSource> scroll = dispatcher.register(literal("sc")
-						.requires(source -> !environment.dedicated || source.hasPermissionLevel(PERMISSION_LEVEL))
+						.requires(source -> !environment.dedicated || source.hasPermissionLevel(PERMISSION_LEVEL) || !source.isExecutedByPlayer())
 						.then(literal("reload")
 							.then(argument("file", word())
 								.suggests(RELOAD_SUGGESTS)
@@ -68,27 +68,27 @@ public class ScrollCommand {
 									switch (argument) {
 										case "configuration":
 											if (Scroll.CONFIGURATION.reload()) {
-												context.getSource().sendMessage(Text.literal(Scroll.language("configuration.reload.success")));
+												context.getSource().sendMessage(Scroll.adventure("configuration.reload.success"));
 											} else {
-												context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scroll.reload.failed", "configuration.toml")));
+												context.getSource().sendMessage(Scroll.adventure("scroll.reload.failed", "configuration.toml"));
 											}
 											break;
 										case "languages":
 											if (Scroll.LANGUAGE.reload()) {
-												context.getSource().sendMessage(Text.literal(Scroll.language("language.reload.success")));
+												context.getSource().sendMessage(Scroll.adventure("language.reload.success"));
 											} else {
-												context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scroll.reload.failed", Scroll.LANGUAGE.getLanguage() + ".properties")));
+												context.getSource().sendMessage(Scroll.adventure("scroll.reload.failed", Scroll.LANGUAGE.getLanguage() + ".properties"));
 											}
 											break;
 										default:
 											Optional<Script> script = ScrollScriptLoader.getScriptByName(argument);
 											try {
 												if (!script.isPresent()) {
-													context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.doesnt.exist", argument)));
+													context.getSource().sendMessage(Scroll.adventure("scripts.doesnt.exist", argument));
 												} else if (ScrollScriptLoader.reloadScript(script.get()).isPresent()) {
-													context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.reload.success", argument)));
+													context.getSource().sendMessage(Scroll.adventure("scripts.reload.success", argument));
 												} else {
-													context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.reload.failed", argument)));
+													context.getSource().sendMessage(Scroll.adventure("scripts.reload.failed", argument));
 												}
 											} catch (Exception e) {
 												Scroll.LOGGER.info("There was an error");
@@ -105,10 +105,10 @@ public class ScrollCommand {
 									String argument = context.getArgument("file", String.class);
 									Optional<Script> script = ScrollScriptLoader.getScriptByName(argument);
 									if (!script.isPresent()) {
-										context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.doesnt.exist", argument)));
+										context.getSource().sendMessage(Scroll.adventure("scripts.doesnt.exist", argument));
 									} else {
 										ScrollScriptLoader.disableScript(script.get());
-										context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.disable.success", argument)));
+										context.getSource().sendMessage(Scroll.adventure("scripts.disable.success", argument));
 									}
 									return 0;
 								})))
@@ -122,9 +122,9 @@ public class ScrollCommand {
 										if (!argument.endsWith(ScrollScriptLoader.EXTENSION))
 											argument = argument + ScrollScriptLoader.EXTENSION;
 										if (!ScrollScriptLoader.enableScriptAt(ScrollScriptLoader.getScriptsFolder().resolve(argument)).isPresent()) {
-											context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.doesnt.exist", argument)));
+											context.getSource().sendMessage(Scroll.adventure("scripts.doesnt.exist", argument));
 										} else {
-											context.getSource().sendMessage(Text.literal(Scroll.languageFormat("scripts.enable.success", argument)));
+											context.getSource().sendMessage(Scroll.adventure("scripts.enable.success", argument));
 										}
 										return 0;
 									})))
