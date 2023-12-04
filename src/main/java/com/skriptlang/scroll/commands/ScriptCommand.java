@@ -16,7 +16,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.skriptlang.scroll.Scroll;
 import com.skriptlang.scroll.ScrollScriptLoader;
 import com.skriptlang.scroll.commands.arguments.CommandParameter;
-import com.skriptlang.scroll.context.ScrollContext;
 import com.skriptlang.scroll.exceptions.ScrollAPIException;
 import com.skriptlang.scroll.language.Languaged;
 import com.skriptlang.scroll.language.ScrollEvent;
@@ -59,14 +58,13 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 	 * 
 	 * @param <T> Generic to be filled with either FabricClientCommandSource for client or ServerCommandSource for the correct environment.
 	 */
-	public static class ScrollCommandContext<T extends CommandSource> extends ScrollContext {
+	public static class ScrollCommandContext<T extends CommandSource> implements TriggerContext {
 
 		private final CommandRegistrar<T> registrar;
 		private final CommandContext<T> context;
 		private int returnCode = 0;
 
 		public ScrollCommandContext(CommandContext<T> context, CommandRegistrar<T> registrar) {
-			super("command");
 			this.registrar = registrar;
 			this.context = context;
 		}
@@ -104,6 +102,11 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 
 		public int getReturnCode() {
 			return returnCode;
+		}
+
+		@Override
+		public String getName() {
+			return "command";
 		}
 
 	}

@@ -48,8 +48,6 @@ public class EffBroadcast extends Effect implements Languaged {
 	public boolean init(Expression<?>[] expressions, int matchedPattern, ParseContext parseContext) {
 		objects = expressions[0];
 		worlds = (Expression<ServerWorld>) expressions[1];
-//		Expression<?>[] messages = objects instanceof ExpressionList ?
-//				((ExpressionList<?>) objects).getExpressions() : new Expression[] {messageExpr};
 		return true;
 	}
 
@@ -79,23 +77,6 @@ public class EffBroadcast extends Effect implements Languaged {
 				continue;
 			receivers.forEach(receiver -> receiver.sendMessage(text));
 		}
-//		for (Expression<?> expression : getMessages()) {
-//			if (message instanceof VariableString) {
-//				BaseComponent[] components = BungeeConverter.convert(((VariableString) message).getMessageComponents(e));
-//				receivers.forEach(receiver -> receiver.spigot().sendMessage(components));
-//			} else if (message instanceof ExprColoured && ((ExprColoured) message).isUnsafeFormat()) { // Manually marked as trusted
-//				for (Object realMessage : message.getArray(e)) {
-//					BaseComponent[] components = BungeeConverter.convert(ChatMessages.parse((String) realMessage));
-//					receivers.forEach(receiver -> receiver.spigot().sendMessage(components));
-//				}
-//			} else {
-//				for (Object object : objects.getArray(context)) {
-//					String message = object instanceof String ? (String) object : TypeManager.toString(CollectionUtils.array(object));
-//					Text text = Text.literal(message);
-//					receivers.forEach(receiver -> receiver.sendMessage(text));
-//				}
-//			}
-//		}
 	}
 
 	@Override

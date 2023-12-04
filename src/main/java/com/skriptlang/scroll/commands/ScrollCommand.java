@@ -23,7 +23,6 @@ import com.skriptlang.scroll.script.Script;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 /**
  * The main command class for handling the /scroll command.

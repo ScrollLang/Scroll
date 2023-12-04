@@ -1,6 +1,9 @@
 package com.skriptlang.scroll.elements;
 
+import java.util.Locale;
+
 import com.skriptlang.scroll.Scroll;
+import com.skriptlang.scroll.objects.Location;
 
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
 import net.kyori.adventure.platform.fabric.FabricAudiences;
@@ -8,10 +11,14 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class Types {
 
@@ -32,11 +39,19 @@ public class Types {
 					FabricAudiences adventure = Scroll.getAdventure();
 					return adventure.toNative(miniMessage.deserialize(input));
 				})
-				.toStringFunction(text -> text.getString())
+				.toStringFunction(Text::getString)
 				.register();
 
 		registration.newType(Vec3d.class, "vec3d", "vec3d@s")
 				.toStringFunction(vector -> vector.getX() + "," + vector.getY() + "," + vector.getZ())
+				.register();
+
+		registration.newType(ItemStack.class, "itemstack", "itemStack@s")
+				.toStringFunction(itemstack -> itemstack.getCount() + " " + Scroll.language("language.of") + " " + Registries.ITEM.getId(itemstack.getItem()).value())
+				.register();
+
+		registration.newType(Location.class, "location", "location@s")
+				.toStringFunction(location -> location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getWorld().asString())
 				.register();
 
 		registration.newType(CommandSource.class, "commandsource", "commandSource@s").register();
@@ -45,19 +60,23 @@ public class Types {
 					if (source.getPlayer() != null)
 						return source.getPlayer().getName().toString();
 					if (source.getServer() != null)
-						return "console";
+						return Scroll.language("general.console");
 					if (source.getEntity() != null)
 						return source.getEntity().getName().toString();
 					return source.toString();
 				})
 				.register();
 
-		registration.newType(World.class, "world", "world@s")
-				.toStringFunction(world -> {
-					if (!Scroll.isServerEnvironment())
-						return world.toString();
-					return world.getServer().getWorld(world.getRegistryKey()).asString();
+		registration.newType(Item.class, "item", "item@s")
+				.literalParser(input -> {
+					input = input.replaceAll("\s", "_").toUpperCase(Locale.ENGLISH);
+					Registry<Item> itemRegistry = Registries.ITEM;
+					Identifier identifier = new Identifier(input);
+					if (!itemRegistry.containsId(identifier))
+						return null;
+					return itemRegistry.get(identifier);
 				})
+				.toStringFunction(item -> Registries.ITEM.getId(item).value())
 				.register();
 	}
 

@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.world.World;
 
 @Environment(EnvType.CLIENT)
 public class ClientTypes {
@@ -14,8 +15,13 @@ public class ClientTypes {
 				.toStringFunction(player -> player.getDisplayName().toString())
 				.defaultChanger(DefaultChangers.PLAYER)
 				.register();
+
 		registration.newType(FabricClientCommandSource.class, "client command source", "clientSourceCommand@s")
 				.toStringFunction(source -> source.getPlayer().getDisplayName().toString())
+				.register();
+
+		registration.newType(World.class, "world", "world@s")
+				.toStringFunction(World::asString)
 				.register();
 	}
 

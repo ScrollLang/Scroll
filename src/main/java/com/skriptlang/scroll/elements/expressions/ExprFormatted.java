@@ -18,7 +18,7 @@ import net.minecraft.text.Text;
 
 @Name("Formatted String")
 @Description("Format a string to a Minecraft Text value.")
-@Examples("broadcast formatted \"<lime green>Hello!</lime green>\"")
+@Examples("broadcast formatted \"<green>Hello!\"")
 @Since("1.0.0")
 public class ExprFormatted implements Expression<Text>, Languaged {
 

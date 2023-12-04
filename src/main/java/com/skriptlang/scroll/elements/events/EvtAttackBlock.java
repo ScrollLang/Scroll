@@ -113,7 +113,6 @@ public class EvtAttackBlock extends ScrollEvent {
 			return position;
 		}
 
-		@Override
 		public World getWorld() {
 			return world;
 		}
