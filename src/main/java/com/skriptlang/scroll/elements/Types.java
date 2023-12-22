@@ -11,6 +11,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -44,6 +45,10 @@ public class Types {
 
 		registration.newType(Vec3d.class, "vec3d", "vec3d@s")
 				.toStringFunction(vector -> vector.getX() + "," + vector.getY() + "," + vector.getZ())
+				.register();
+
+		registration.newType(PlayerEntity.class, "player entity", "player entit@y@ies")
+				.toStringFunction(player -> player.getDisplayName().toString())
 				.register();
 
 		registration.newType(ItemStack.class, "itemstack", "itemStack@s")

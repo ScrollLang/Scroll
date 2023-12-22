@@ -31,8 +31,10 @@ import com.skriptlang.scroll.utils.FileUtils;
 import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.log.LogEntry;
+import io.github.syst3ms.skriptparser.log.LogType;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
+import io.github.syst3ms.skriptparser.util.ConsoleColors;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
