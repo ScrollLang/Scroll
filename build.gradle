@@ -51,7 +51,7 @@ dependencies {
 	modImplementation include('org.javassist:javassist:3.30.2-GA')
 
 	// TOML
-	modImplementation include('org.tomlj:tomlj:1.1.0')
+	modImplementation include('org.tomlj:tomlj:1.1.1')
 	modImplementation include('org.antlr:antlr4-runtime:4.13.1')
 
 	// skript-parser
