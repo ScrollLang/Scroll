@@ -2,7 +2,9 @@ package com.skriptlang.scroll;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UnknownFormatConversionException;
 
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +56,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	private static Path ADDONS_FOLDER;
 	private static Path SCROLL_FOLDER;
 
+	static final List<ScrollAddon> ADDONS = new ArrayList<>();
 	static FabricAudiences ADVENTURE;
 	static MinecraftServer SERVER;
 
@@ -116,6 +119,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				e.printStackTrace();
 			}
 		});
+		ADDONS.forEach(ScrollAddon::startRegistration);
 		Parser.printLogs(REGISTRATION.register(), Calendar.getInstance(), true);
 
 		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));

@@ -60,6 +60,19 @@ dependencies {
 
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "scroll-lang"
+            url = "https://maven.pkg.github.com/ScrollLang/Scroll"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scroll-lang.username")
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("scroll-lang.token")
+            }
+        }
+    }
+}
+
 processResources {
 	inputs.property 'version', project.version
 	filesMatching('fabric.mod.json') {
