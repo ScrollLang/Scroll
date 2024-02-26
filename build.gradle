@@ -44,7 +44,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Adventure API
-	modImplementation include("net.kyori:adventure-platform-fabric:5.9.0")
+	modImplementation include("net.kyori:adventure-platform-fabric:5.12.0")
 
 	// Reflections
 	modImplementation include('org.reflections:reflections:0.10.2')
