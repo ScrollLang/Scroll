@@ -31,6 +31,7 @@ import io.github.syst3ms.skriptparser.lang.entries.SectionConfiguration;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.parsing.ParserState;
+import io.github.syst3ms.skriptparser.types.PatternType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 
@@ -163,9 +164,9 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 			int leftCount = 0;
 			int rightCount = 0;
 			for (int i = 0; i < string.length(); i++) {
-				if (string.charAt(0) == '<') {
+				if (string.charAt(i) == '<') {
 					leftCount++;
-				} else if (string.charAt(0) == '>') {
+				} else if (string.charAt(i) == '>') {
 					rightCount++;
 				}
 			}
@@ -179,23 +180,26 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 						.map(MatchResult::group)
 						.map(CommandParameter::parse)
 						.forEach(parameter -> {
-							parameters.stream()
-									.map(CommandParameter::getPatternType)
-									.filter(type -> {
-										Class<?> typeClass = type.getType().getClass();
-										occurances.put(typeClass, occurances.getOrDefault(typeClass, 0) + 1);
-										// Negated
-										if (!Lists.newArrayList(String.class, Text.class).contains(typeClass))
-											return true;
-										if (type.isSingle())
-											return true;
-										// We want to throw for String/Text of plural if there are more parameters to add after this.
-										return false;
-									})
-									.findFirst()
-									.orElseThrow(() -> new ScrollAPIException(Scroll.languageFormat("scripts.commands.register.parameters.strings.not.last", parameter.getPatternType().getType().getBaseName())));
 							parameters.add(parameter);
+							PatternType<?> patternType = parameter.getPatternType();
+							Class<?> typeClass = patternType.getType().getTypeClass();
+							occurances.put(typeClass, occurances.getOrDefault(typeClass, 0) + 1);
 						});
+
+				// Special cases:
+				// - Text must be placed as the last parameter.
+				List<?> cases = Lists.newArrayList(String.class, Text.class);
+				for (CommandParameter<?> parameter : parameters) {
+					PatternType<?> patternType = parameter.getPatternType();
+					Class<?> typeClass = patternType.getType().getTypeClass();
+					if (!cases.contains(typeClass))
+						continue;
+					if (occurances.getOrDefault(typeClass, 0) <= 1)
+						continue;
+					// We want to throw for String/Text of plural if there are more parameters to add of these types.
+					throw new ScrollAPIException(Scroll.languageFormat("scripts.commands.register.parameters.texts.not.last", parameter.getPatternType().getType().getBaseName()));
+				}
+
 				// Apply an index for the type. Example making the identifier be string-1
 				Map<Type, Integer> indices = new HashMap<>();
 				for (CommandParameter<?> parameter : parameters) {

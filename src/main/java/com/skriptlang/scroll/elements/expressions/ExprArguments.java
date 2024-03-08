@@ -42,15 +42,15 @@ import io.github.syst3ms.skriptparser.types.Type;
 public class ExprArguments implements Expression<Object>, Languaged {
 
 	static {
-//		Scroll.getRegistration().addExpression(ExprArguments.class, Object.class, true,
-//				"[the] last arg[ument]", // LAST
-//				"[the] arg[ument](-| )<(\\d+)>", // ORDINAL
-//				"[the] <(\\d*1)st|(\\d*2)nd|(\\d*3)rd|(\\d*[4-90])th> arg[ument][s]", // ORDINAL
-//				"[(all [[of] the]|the)] arg[ument][(1:s)]", // SINGLE OR ALL
-//				"[the] %=type%( |-)arg[ument][( |-)<\\d+>]", // TYPE
-//				"[the] arg[ument]( |-)%=type%[( |-)<\\d+>]", // TYPE
-//				"[the] arg[ument][s] [with id[entifier][s]] %strings%" // IDENTIFIER
-//		);
+		Scroll.getRegistration().addExpression(ExprArguments.class, Object.class, true,
+				"[the] last arg[ument]", // LAST
+				"[the] arg[ument](-| )<(\\d+)>", // ORDINAL
+				"[the] <(\\d*1)st|(\\d*2)nd|(\\d*3)rd|(\\d*[4-90])th> arg[ument][s]", // ORDINAL
+				"[(all [[of] the]|the)] arg[ument][(1:s)]", // SINGLE OR ALL
+				"[the] %*type%( |-)arg[ument][( |-)<\\d+>]", // TYPE
+				"[the] arg[ument]( |-)%*type%[( |-)<\\d+>]", // TYPE
+				"[the] arg[ument][s] [with id[entifier][s]] %strings%" // IDENTIFIER
+		);
 	}
 
 	private static final int LAST = 0, ORDINAL = 1, SINGLE = 2, ALL = 3, TYPE = 4,  IDENTIFIER = 5;

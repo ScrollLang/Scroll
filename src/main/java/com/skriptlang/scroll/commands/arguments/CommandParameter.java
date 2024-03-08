@@ -9,6 +9,7 @@ import com.skriptlang.scroll.exceptions.ScrollAPIException;
 
 import io.github.syst3ms.skriptparser.types.PatternType;
 import io.github.syst3ms.skriptparser.types.TypeManager;
+import io.github.syst3ms.skriptparser.util.StringUtils;
 
 public class CommandParameter<T> {
 
@@ -33,8 +34,10 @@ public class CommandParameter<T> {
 	public static CommandParameter<?> parse(String input) throws ScrollAPIException {
 		boolean optional = false;
 		if (input.startsWith("[") && input.endsWith("]")) {
-			input = input.replaceFirst("[", "").replace("]", "");
+			input = StringUtils.getEnclosedText(input, '[', ']', 0).orElse(input);
 			optional = true;
+		} else if (input.startsWith("<") && input.endsWith(">")) {
+			input = StringUtils.getEnclosedText(input, '<', '>', 0).orElse(input);
 		}
 		String typeInput = input;
 		String identifier = null;
@@ -45,7 +48,7 @@ public class CommandParameter<T> {
 		}
 		Optional<PatternType<?>> type = TypeManager.getPatternType(typeInput);
 		if (!type.isPresent())
-			throw new ScrollAPIException(Scroll.languageFormat("scripts.commands.register.parameters.no.type", typeInput));
+			throw new ScrollAPIException(Scroll.languageFormat("scripts.commands.register.parameters.no.type", typeInput, input));
 		if (!type.get().getType().getLiteralParser().isPresent())
 			throw new ScrollAPIException(Scroll.languageFormat("scripts.commands.register.parameters.no.parser", typeInput));
 		return new CommandParameter<>(type.get(), identifier, optional);

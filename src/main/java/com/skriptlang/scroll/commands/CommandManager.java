@@ -91,7 +91,6 @@ public class CommandManager {
 
 	public static void unregisterAll(Script script) {
 		for (Command command : commands.get(script)) {
-			System.out.println("made it here " + command.getName());
 			if (command.isClientSided()) {
 				if (clientCommandRegistrar == null)
 					continue;
