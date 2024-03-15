@@ -63,11 +63,21 @@ dependencies {
 publishing {
     repositories {
         maven {
-            name = "scroll-lang"
-            url = "https://maven.pkg.github.com/ScrollLang/Scroll"
+            name = 'scroll'
+            url = 'https://maven.pkg.github.com/ScrollLang/Scroll'
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scroll-lang.username")
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("scroll-lang.token")
+                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("scrollPassword")
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+                from(components.java)
+                version = version
+                groupId = 'com.scrollang'
+                def releases = 'scroll' // Don't modify
+                def snapshots = 'scroll-dev' // Don't modify
+                artifactId = version.contains('-dev') ? snapshots : releases
             }
         }
     }
@@ -94,15 +104,6 @@ jar {
 	from('LICENSE') {
 		rename {
 			"${it}_${project.base.archivesName.get()}"
-		}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
 		}
 	}
 }

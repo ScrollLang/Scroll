@@ -5,24 +5,25 @@
 	"name": "Scroll",
 	"description": "A Skript loader for the Fabric API",
 	"authors": [
-		"LimeGlass"
+		"LimeGlass",
+		"Scroll Language"
 	],
 	"contact": {
-		"homepage": "https://skriptlang.org",
-		"sources": "https://github.com/SkriptLang"
+		"homepage": "https://scroll-lang.org",
+		"sources": "https://github.com/ScrollLang"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/scroll/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.skriptlang.scroll.Scroll"
+			"com.scrolllang.scroll.Scroll"
 		],
 		"client": [
-			"com.skriptlang.scroll.ScrollClient"
+			"com.scrolllang.scroll.ScrollClient"
 		],
 		"server": [
-			"com.skriptlang.scroll.ScrollServer"
+			"com.scrolllang.scroll.ScrollServer"
 		]
 	},
 	"depends": {
