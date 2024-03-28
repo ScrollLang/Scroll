@@ -1,7 +1,6 @@
 package org.scrolllang.scroll;
 
 import org.jetbrains.annotations.Nullable;
-import org.scrolllang.scroll.Scroll;
 import org.scrolllang.scroll.elements.ClientTypes;
 
 import net.fabricmc.api.ClientModInitializer;

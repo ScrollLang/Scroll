@@ -21,6 +21,14 @@ base {
 
 repositories {
 	mavenCentral()
+    maven {
+        name = 'skript-parser'
+        url = uri("https://maven.pkg.github.com/ScrollLang/skript-parser")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
+            password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("scrollPassword")
+        }
+    }
 }
 
 loom {
@@ -55,7 +63,8 @@ dependencies {
 	modImplementation include('org.antlr:antlr4-runtime:4.13.1')
 
 	// skript-parser
-	implementation include(project(':skript-parser'))
+	modImplementation ('org.scrollang:skript-parser:alpha1')
+	//implementation include(project(':skript-parser'))
 	//clientImplementation project(':skript-parser').sourceSets.client.output
 
 }

@@ -17,13 +17,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.scrolllang.scroll.Scroll"
+			"org.scrolllang.scroll.Scroll"
 		],
 		"client": [
-			"com.scrolllang.scroll.ScrollClient"
+			"org.scrolllang.scroll.ScrollClient"
 		],
 		"server": [
-			"com.scrolllang.scroll.ScrollServer"
+			"org.scrolllang.scroll.ScrollServer"
 		]
 	},
 	"depends": {

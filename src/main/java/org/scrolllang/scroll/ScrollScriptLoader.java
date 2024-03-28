@@ -19,22 +19,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.scrolllang.scroll.commands.CommandManager;
 import org.scrolllang.scroll.language.ScrollEvent;
 import org.scrolllang.scroll.script.Script;
 import org.scrolllang.scroll.utils.FileUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Sets;
 
 import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.log.LogEntry;
-import io.github.syst3ms.skriptparser.log.LogType;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
-import io.github.syst3ms.skriptparser.util.ConsoleColors;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**

@@ -27,7 +27,9 @@ import io.github.syst3ms.skriptparser.log.ErrorType;
 import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.registration.SkriptAddon;
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
+import io.github.syst3ms.skriptparser.registration.SkriptRegistration.EventRegistrar;
 import io.github.syst3ms.skriptparser.types.TypeManager;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -54,6 +56,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	private static Path GAME_DIRECTORY;
 	private static Path ADDONS_FOLDER;
 	private static Path SCROLL_FOLDER;
+	private static Scroll INSTANCE;
 
 	static final List<ScrollAddon> ADDONS = new ArrayList<>();
 	static FabricAudiences ADVENTURE;
@@ -61,6 +64,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		INSTANCE = this;
 		FabricLoader loader = FabricLoader.getInstance();
 		GAME_DIRECTORY = loader.getGameDir();
 		ENVIRONMENT = loader.getEnvironmentType();
@@ -118,8 +122,12 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				e.printStackTrace();
 			}
 		});
-		ADDONS.forEach(ScrollAddon::startRegistration);
 		Parser.printLogs(REGISTRATION.register(), Calendar.getInstance(), true);
+		ADDONS.forEach(addon -> {
+			ScrollRegistration registration = new ScrollRegistration(addon);
+			addon.startRegistration(registration);
+			Parser.printLogs(registration.register(), Calendar.getInstance(), true);
+		});
 
 		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
@@ -254,7 +262,15 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		LOGGER.info(message);
 	}
 
+	public static Scroll getInstance() {
+		if (INSTANCE == null)
+			throw new IllegalStateException();
+		return INSTANCE;
+	}
+
 	/**
+	 * Should only be used by Scroll internally. Use {@link ScrollAddon#startRegistration(ScrollRegistration)}
+	 * 
 	 * @return The main registration for Scroll syntaxes and addon syntaxes. Use this method over {@link Parser#getMainRegistration()}.
 	 */
 	public static SkriptRegistration getRegistration() {
@@ -293,6 +309,17 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		return LOGGER;
 	}
 
+	public static List<ScrollAddon> getScrollAddons() {
+		return ADDONS;
+	}
+
+	/**
+	 * This is an override.
+	 */
+	public static List<SkriptAddon> getAddons() {
+		throw new UnsupportedOperationException();
+	}
+
 	@Override
 	public void handleTrigger(Trigger trigger) {
 		SkriptEvent event = trigger.getEvent();
@@ -304,6 +331,18 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	}
 
 	/**
+	 * Returns an EventRegistrar for a {@link ScrollEvent}
+	 * 
+	 * @param event the ScrollEvent class
+	 * @param context the {@link TriggerContext} this ScrollEvent will handle.
+	 * @param patterns the ScrollEvent patterns.
+	 * @return EventRegistrar
+	 */
+	public static EventRegistrar<? extends ScrollEvent> newEvent(String name, Class<? extends ScrollEvent> event, Class<? extends TriggerContext> context, String... patterns) {
+		return (EventRegistrar<? extends ScrollEvent>) REGISTRATION.newEvent(event, patterns).setHandledContexts(context).addData("scroll-information", new ScrollEvent.Information(name));
+	}
+
+	/**
 	 * Registers a {@link ScrollEvent}
 	 * 
 	 * @param event the ScrollEvent class
@@ -311,8 +350,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param patterns the ScrollEvent patterns.
 	 */
 	public static void addEvent(String name, Class<? extends ScrollEvent> event, Class<? extends TriggerContext> context, String... patterns) {
-		// TODO add a check for same names.
-		REGISTRATION.newEvent(event, patterns).setHandledContexts(context).addData("scroll-information", new ScrollEvent.Information(name)).register();
+		newEvent(name, event, context, patterns).register();
 	}
 
 	/**

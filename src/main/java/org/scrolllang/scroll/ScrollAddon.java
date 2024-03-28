@@ -2,6 +2,7 @@ package org.scrolllang.scroll;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import io.github.syst3ms.skriptparser.util.FileUtils;
 
@@ -34,15 +35,22 @@ public abstract class ScrollAddon {
 	}
 
 	/**
-	 * Called when your addon gets initalized.
-	 * This is called before Scroll has registered syntaxes.
+	 * Called when you can safely start registering syntaxes.
+	 * Should only be done on mod initalization. Not later.
+	 * 
+	 * @param registration The registration to use to add syntaxes.
 	 */
-	protected abstract void initAddon();
+	protected abstract void startRegistration(ScrollRegistration registration);
 
 	/**
-	 * Called when you can safely start registering syntaxes.
+	 * The data folder where you addon should store configurations.
+	 * Directory may not exist. You need to make directories.
+	 * 
+	 * @return Path to the data folder of this addon.
 	 */
-	protected abstract void startRegistration();
+	public Path getDataFolder() {
+		return Scroll.getInstance().getAddonsFolder().resolve(name);
+	}
 
 	/**
 	 * @return The name of this ScrollAddon.

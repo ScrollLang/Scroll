@@ -1,7 +1,5 @@
 package org.scrolllang.scroll.elements;
 
-import org.scrolllang.scroll.elements.DefaultChangers;
-
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

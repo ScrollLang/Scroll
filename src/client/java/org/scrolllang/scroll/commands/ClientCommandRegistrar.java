@@ -4,10 +4,6 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 import org.scrolllang.scroll.Scroll;
-import org.scrolllang.scroll.commands.Command;
-import org.scrolllang.scroll.commands.CommandManager;
-import org.scrolllang.scroll.commands.CommandRegistrar;
-import org.scrolllang.scroll.commands.ScriptCommand;
 import org.scrolllang.scroll.commands.ScriptCommand.ScrollCommandContext;
 import org.scrolllang.scroll.commands.arguments.CommandParameter;
 import org.scrolllang.scroll.language.Languaged;
