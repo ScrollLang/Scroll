@@ -63,7 +63,7 @@ dependencies {
 	modImplementation include('org.antlr:antlr4-runtime:4.13.1')
 
 	// skript-parser
-	modImplementation ('org.scrollang:skript-parser:alpha1')
+	modImplementation ('org.scrolllang:skript-parser:alpha1')
 	//implementation include(project(':skript-parser'))
 	//clientImplementation project(':skript-parser').sourceSets.client.output
 
