@@ -76,7 +76,7 @@ publishing {
             url = 'https://maven.pkg.github.com/ScrollLang/Scroll'
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("scrollPassword")
+                password = System.getenv("PACKAGES_TOKEN") ?: project.findProperty("scrollPassword")
             }
         }
         publications {
