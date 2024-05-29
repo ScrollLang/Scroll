@@ -18,6 +18,18 @@ Mention me `limeglass` on SkUnity Discord for any information.
 
 Pull requests open.
 
+skript-parser uses GitHub packages, and is required by Scroll.
+
+To download GitHub packages you'll have to include your GitHub username and a GitHub token.
+
+See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for how to obtain a token (you'll only need permission read:packages).
+
+Add this to a gradle.properties at your gradle global cache C:/Users/USER/.gradle/gradle.properties or in the gradle.properties of the project. Preferably the first latter to avoid pushing tokens.
+```
+scrollUsername=USERNAME
+scrollPassword=githubToken
+```
+
 ### Setup
 ```
 git clone https://github.com/TheLimeGlass/Scroll
