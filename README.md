@@ -9,7 +9,7 @@ Mention me `limeglass` on SkUnity Discord for any information.
 
 ### Requirements
 - Fabric API (Currently 0.88 but not locked in this version)
-- Minecraft (Currently 1.20.1 but not locked and only supporting this version and latest currently)
+- Minecraft (Currently 1.20.1 but not locked and only supporting this version currently)
 - Java 17+
 
 ---
