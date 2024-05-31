@@ -22,12 +22,7 @@ base {
 repositories {
 	mavenCentral()
     maven {
-        name = 'skript-parser'
-        url = uri("https://maven.pkg.github.com/ScrollLang/skript-parser")
-        credentials {
-            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
-            password = System.getenv("PACKAGES_TOKEN") ?: System.getenv("GITHUB_TOKEN") ?: project.findProperty("scrollPassword")
-        }
+        url = 'https://maven.pkg.github.com/ScrollLang/skript-parser'
     }
 }
 
@@ -65,18 +60,17 @@ dependencies {
 	// skript-parser
 	modImplementation include('org.scrolllang:skript-parser:alpha2')
 	//implementation include(project(':skript-parser'))
-	//clientImplementation project(':skript-parser').sourceSets.client.output
 
 }
 
 publishing {
     repositories {
         maven {
-            name = 'scroll'
+            name = 'Scroll'
             url = 'https://maven.pkg.github.com/ScrollLang/Scroll'
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
-                password = System.getenv("PACKAGES_TOKEN") ?: System.getenv("GITHUB_TOKEN") ?: project.findProperty("scrollPassword")
+                password = System.getenv("PACKAGES_TOKEN") ?: project.findProperty("scrollPassword")
             }
         }
         publications {
@@ -86,7 +80,7 @@ publishing {
                 groupId = 'org.scrolllang'
                 def releases = 'scroll' // Don't modify
                 def snapshots = 'scroll-dev' // Don't modify
-                artifactId = version.contains('-dev') ? snapshots : releases
+                artifactId = version.contains('dev') ? snapshots : releases
             }
         }
     }
