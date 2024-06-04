@@ -11,10 +11,6 @@ plugins {
 compileTestJava.options.encoding = 'UTF-8'
 compileJava.options.encoding = 'UTF-8'
 
-//archivesBaseName = project.archives_base_name
-//version = project.mod_version
-//group = project.maven_group
-
 base {
 	archivesName = project.archives_base_name
 }
@@ -24,7 +20,7 @@ repositories {
     maven {
         url = 'https://maven.pkg.github.com/ScrollLang/skript-parser'
         credentials {
-            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
+            username = System.getenv("PACKAGES_USER") ?: project.findProperty("scrollUsername")
             password = System.getenv("PACKAGES_TOKEN") ?: project.findProperty("scrollPassword")
         }
     }
@@ -73,7 +69,7 @@ publishing {
             name = 'Scroll'
             url = 'https://maven.pkg.github.com/ScrollLang/Scroll'
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("scrollUsername")
+                username = System.getenv("PACKAGES_USER") ?: project.findProperty("scrollUsername")
                 password = System.getenv("PACKAGES_TOKEN") ?: project.findProperty("scrollPassword")
             }
         }
