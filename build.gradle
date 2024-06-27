@@ -5,6 +5,7 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
+	id 'eclipse'
 	id 'java'
 }
 
