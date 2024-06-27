@@ -21,7 +21,7 @@ repositories {
         url = 'https://maven.pkg.github.com/ScrollLang/skript-parser'
         credentials {
             username = System.getenv("PACKAGES_USER") ?: project.findProperty("scrollUsername")
-            password = System.getenv("PACKAGES_TOKEN") ?: project.findProperty("scrollPassword")
+            password = System.getenv("PACKAGES_KEY") ?: project.findProperty("scrollPassword")
         }
     }
 }
@@ -70,7 +70,7 @@ publishing {
             url = 'https://maven.pkg.github.com/ScrollLang/Scroll'
             credentials {
                 username = System.getenv("PACKAGES_USER") ?: project.findProperty("scrollUsername")
-                password = System.getenv("PACKAGES_TOKEN") ?: project.findProperty("scrollPassword")
+                password = System.getenv("PACKAGES_KEY") ?: project.findProperty("scrollPassword")
             }
         }
         publications {
