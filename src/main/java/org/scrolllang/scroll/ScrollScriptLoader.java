@@ -107,7 +107,6 @@ public class ScrollScriptLoader {
 	 * Using the default validation method to collect .scroll files.
 	 * 
 	 * @param directory The directory path to search for .scroll files.
-	 * @param disabled If the result should only be the disabled scripts or not.
 	 * @return A collection of all the found and constructed {@link Script} within the defined path directory.
 	 * @throws IllegalArgumentException if the provided path was not a directory.
 	 */
