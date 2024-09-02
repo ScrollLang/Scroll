@@ -149,7 +149,7 @@ public class ScrollCommand implements Languaged {
 	}
 
 	private static Stream<String> collectDisabledScripts() {
-		Stream<String> stream = ScrollScriptLoader.collectScriptsAt(ScrollScriptLoader.getScriptsFolder(), true)
+		Stream<String> stream = ScrollScriptLoader.collectScriptsAt(ScrollScriptLoader.getScriptsFolder(), path -> path.getFileName().toString().startsWith(ScrollScriptLoader.DISABLED_PREFIX))
 				.map(Path::getFileName)
 				.map(Path::toString);
 		if (REMOVE_DISABLED_PREFIX)

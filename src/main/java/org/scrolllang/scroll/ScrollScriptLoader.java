@@ -112,8 +112,8 @@ public class ScrollScriptLoader {
 	 * @throws IllegalArgumentException if the provided path was not a directory.
 	 */
 	@NotNull
-	public static Stream<Path> collectScriptsAt(Path directory, boolean disabled) {
-		return collectScriptsAt(directory, disabled, ScrollScriptLoader::validateScriptAt);
+	public static Stream<Path> collectScriptsAt(Path directory) {
+		return collectScriptsAt(directory, ScrollScriptLoader::validateScriptAt);
 	}
 
 	/**
@@ -121,13 +121,12 @@ public class ScrollScriptLoader {
 	 * Use the filter to apply additional checks to the paths.
 	 * 
 	 * @param directory The directory path to search for .scroll files.
-	 * @param disabled If the result should only be the disabled scripts or not.
 	 * @param filter The filter to apply to the paths.
 	 * @return A collection of all the found and constructed {@link Script} within the defined path directory.
 	 * @throws IllegalArgumentException if the provided path was not a directory.
 	 */
 	@NotNull
-	public static Stream<Path> collectScriptsAt(Path directory, boolean disabled, Predicate<Path> filter) {
+	public static Stream<Path> collectScriptsAt(Path directory, Predicate<Path> filter) {
 		if (!Files.isDirectory(directory)) {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
 			return Stream.empty();
@@ -169,7 +168,7 @@ public class ScrollScriptLoader {
 		long start = System.nanoTime();
 		LOADED_SCRIPTS.clear(); // TODO proper unloading.
 		SCRIPTS_FOLDER = scriptsPath;
-		List<Script> scripts = collectScriptsAt(scriptsPath, false)
+		List<Script> scripts = collectScriptsAt(scriptsPath)
 				.parallel()
 				.map(ScrollScriptLoader::loadScriptAt)
 				.filter(Optional::isPresent)
@@ -274,7 +273,7 @@ public class ScrollScriptLoader {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
 			return new ArrayList<>();
 		}
-		return collectScriptsAt(directory, false)
+		return collectScriptsAt(directory)
 				.map(ScrollScriptLoader::loadScriptAt)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
