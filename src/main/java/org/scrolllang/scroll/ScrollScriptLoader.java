@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -103,6 +104,7 @@ public class ScrollScriptLoader {
 
 	/**
 	 * Collects all the .scroll scripts at the defined {@link Path} directory.
+	 * Using the default validation method to collect .scroll files.
 	 * 
 	 * @param directory The directory path to search for .scroll files.
 	 * @param disabled If the result should only be the disabled scripts or not.
@@ -111,6 +113,21 @@ public class ScrollScriptLoader {
 	 */
 	@NotNull
 	public static Stream<Path> collectScriptsAt(Path directory, boolean disabled) {
+		return collectScriptsAt(directory, disabled, ScrollScriptLoader::validateScriptAt);
+	}
+
+	/**
+	 * Collects all the scripts at the defined {@link Path} directory.
+	 * Use the filter to apply additional checks to the paths.
+	 * 
+	 * @param directory The directory path to search for .scroll files.
+	 * @param disabled If the result should only be the disabled scripts or not.
+	 * @param filter The filter to apply to the paths.
+	 * @return A collection of all the found and constructed {@link Script} within the defined path directory.
+	 * @throws IllegalArgumentException if the provided path was not a directory.
+	 */
+	@NotNull
+	public static Stream<Path> collectScriptsAt(Path directory, boolean disabled, Predicate<Path> filter) {
 		if (!Files.isDirectory(directory)) {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.load.error.not.directory", directory.toString()));
 			return Stream.empty();
@@ -128,7 +145,7 @@ public class ScrollScriptLoader {
 							}
 						return Stream.of(path);
 					})
-					.filter(ScrollScriptLoader::validateScriptAt);
+					.filter(filter);
 		} catch (IOException exception) {
 			Scroll.printException(exception, Scroll.languageFormat("files.read.directory", directory));
 			return Stream.empty();
