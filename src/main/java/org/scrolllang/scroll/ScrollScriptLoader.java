@@ -42,7 +42,15 @@ public class ScrollScriptLoader {
 
 	private static Path SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/scripts"));
 
-	private static final Collection<String> RESERVED_NAMES = Sets.newHashSet("configuration.scroll", "config.scroll", "languages.scroll", "language.scroll");
+	private static final Collection<String> RESERVED_NAMES = Sets.newHashSet(
+		"configuration.scroll",
+		"languages.scroll",
+		"language.scroll",
+		"settings.scroll",
+		"config.scroll",
+		"lang.scroll"
+	);
+
 	private static final List<Script> LOADED_SCRIPTS = new ArrayList<>();
 	private static final boolean DEBUG = Scroll.CONFIGURATION.isDebug();
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.scrolllang.scroll.Scroll;
+import org.scrolllang.scroll.ScrollAddon;
 import org.scrolllang.scroll.exceptions.EmptyStacktraceException;
 import org.slf4j.Logger;
 
@@ -21,6 +22,7 @@ public class ExceptionPrinter extends CommonPrinter {
 	private static List<String> mods = new ArrayList<>();
 
 	private final Throwable throwable;
+	private final ScrollAddon addon;
 
 	/**
 	 * Constructs an exception printer.
@@ -28,9 +30,10 @@ public class ExceptionPrinter extends CommonPrinter {
 	 * @param throwable The cause of the exception.
 	 * @param messages Optionally any messages needing to describe the error.
 	 */
-	public ExceptionPrinter(Throwable throwable, String... messages) {
+	public ExceptionPrinter(ScrollAddon addon, Throwable throwable, String... messages) {
 		super(messages);
 		this.throwable = throwable;
+		this.addon = addon;
 	}
 
 	/**
@@ -45,7 +48,7 @@ public class ExceptionPrinter extends CommonPrinter {
 			return new EmptyStacktraceException();
 
 		logEx();
-		logEx("[Scroll] Severe Error:");
+		logEx("[" + addon.getName() + "] Severe Error:");
 		logEx(messages);
 		logEx();
 		if (mods.isEmpty()) {

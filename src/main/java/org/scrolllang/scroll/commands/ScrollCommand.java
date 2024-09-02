@@ -24,6 +24,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 
 /**
  * The main command class for handling the /scroll command.
@@ -59,7 +60,7 @@ public class ScrollCommand implements Languaged {
 		if (Scroll.CONFIGURATION.getCommandSection().getBoolean("scroll.commands.enabled", () -> true)) {
 			CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 				final LiteralCommandNode<ServerCommandSource> scroll = dispatcher.register(literal("sc")
-						.requires(source -> !environment.dedicated || source.hasPermissionLevel(PERMISSION_LEVEL) || !source.isExecutedByPlayer())
+						.requires(source -> environment != RegistrationEnvironment.DEDICATED || source.hasPermissionLevel(PERMISSION_LEVEL) || !source.isExecutedByPlayer())
 						.executes(ScrollCommand::noArguments)
 						.then(literal("reload")
 							.then(argument("file", word())

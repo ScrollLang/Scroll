@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.syst3ms.skriptparser.util.FileUtils;
 
 /**
@@ -11,10 +14,34 @@ import io.github.syst3ms.skriptparser.util.FileUtils;
  */
 public abstract class ScrollAddon {
 
+	private final Logger logger;
+	private final int priority;
 	private final String name;
 
+	/**
+	 * Registers a new ScrollAddon with a priority of 100.
+	 * The lowest priotiy to 0 will be loaded first.
+	 * 
+	 * @param name The name of the addon being registered.
+	 */
 	protected ScrollAddon(String name) {
+		this(name, 100);
+	}
+
+	/**
+	 * Registers a new ScrollAddon with a priority of 100.
+	 * The lowest priotiy to 0 will be loaded first.
+	 * 
+	 * @param name The name of the addon being registered.
+	 * @param priority The priority of the addon.
+	 */
+	protected ScrollAddon(String name, int priority) {
+		this.logger = LoggerFactory.getLogger(name);
+		this.priority = priority < 0 ? 0 : priority;
 		this.name = name;
+		if (Scroll.ADDONS.stream().anyMatch(addon -> addon.getName().equals(name)))
+			throw new IllegalStateException("Addon name '" + name + "'' is already registered.");
+
 		Scroll.ADDONS.add(this);
 	}
 
@@ -52,11 +79,40 @@ public abstract class ScrollAddon {
 		return Scroll.getInstance().getAddonsFolder().resolve(name);
 	}
 
+	public void info(String message) {
+		logger.info(message);
+	}
+
+	public void warn(String message) {
+		logger.warn(message);
+	}
+
+	public void error(String message) {
+		logger.error(message);
+	}
+
+	/**
+	 * @return The logger for this ScrollAddon.
+	 */
+	public Logger getLogger() {
+		return logger;
+	}
+
 	/**
 	 * @return The name of this ScrollAddon.
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * The load priority of this addon.
+	 * The lowest priotiy to 0 will be loaded first.
+	 * 
+	 * @return The priority of this addon.
+	 */
+	public int getPriority() {
+		return priority;
 	}
 
 }

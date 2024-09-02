@@ -2,8 +2,8 @@ package org.scrolllang.scroll;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UnknownFormatConversionException;
 
@@ -18,6 +18,8 @@ import org.scrolllang.scroll.log.ExceptionPrinter;
 import org.scrolllang.scroll.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
@@ -58,7 +60,16 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	private static Path SCROLL_FOLDER;
 	private static Scroll INSTANCE;
 
-	static final List<ScrollAddon> ADDONS = new ArrayList<>();
+	private static final ScrollAddon SELF = new ScrollAddon("Scroll", 0) {
+
+		@Override
+		protected void startRegistration(ScrollRegistration registration) {
+
+		}
+
+	};
+
+	static final List<ScrollAddon> ADDONS = Lists.newArrayList(SELF);
 	static FabricAudiences ADVENTURE;
 	static MinecraftServer SERVER;
 
@@ -123,11 +134,13 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 			}
 		});
 		Parser.printLogs(REGISTRATION.register(), Calendar.getInstance(), true);
-		ADDONS.forEach(addon -> {
-			ScrollRegistration registration = new ScrollRegistration(addon);
-			addon.startRegistration(registration);
-			Parser.printLogs(registration.register(), Calendar.getInstance(), true);
-		});
+		ADDONS.stream()
+			.sorted(Comparator.comparingInt(ScrollAddon::getPriority).reversed())
+			.forEach(addon -> {
+				ScrollRegistration registration = new ScrollRegistration(addon);
+				addon.startRegistration(registration);
+				Parser.printLogs(registration.register(), Calendar.getInstance(), true);
+			});
 
 		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
@@ -262,6 +275,37 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		LOGGER.info(message);
 	}
 
+	/**
+	 * Allows to insert logging information during parse time of Scroll scripts.
+	 * Use this method for script parsing related warnings.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 */
+	public static void warning(String message) {
+		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
+			ScrollScriptLoader.CURRENT_LOGGER.warn(message);
+			return;
+		}
+		LOGGER.warn(message);
+	}
+
+	/**
+	 * Allows to insert logging information during parse time of Scroll scripts.
+	 * Use this method for script parsing related warnings.
+	 * See {@link #LOGGER} for other errors and info messages.
+	 * 
+	 * @param message The message to print.
+	 * @param tip A hint to provide to the Scroll user for the error.
+	 */
+	public static void warning(String message, @Nullable String tip) {
+		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
+			ScrollScriptLoader.CURRENT_LOGGER.warn(message, tip);
+			return;
+		}
+		LOGGER.warn(message);
+	}
+
 	public static Scroll getInstance() {
 		if (INSTANCE == null)
 			throw new IllegalStateException();
@@ -361,7 +405,18 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @return an EmptyStacktraceException to throw if code execution should terminate.
 	 */
 	public static EmptyStacktraceException printException(Throwable throwable, String... messages) {
-		return new ExceptionPrinter(throwable, messages).print(LOGGER);
+		return printException(SELF, throwable, messages);
+	}
+
+	/**
+	 * Safely prints an exception and extra information to the console.
+	 * 
+	 * @param throwable The {@link Throwable} that has caused an error.
+	 * @param messages Optionally any messages to print along with the exception for descriptions.
+	 * @return an EmptyStacktraceException to throw if code execution should terminate.
+	 */
+	public static EmptyStacktraceException printException(ScrollAddon addon, Throwable throwable, String... messages) {
+		return new ExceptionPrinter(addon, throwable, messages).print(LOGGER);
 	}
 
 }

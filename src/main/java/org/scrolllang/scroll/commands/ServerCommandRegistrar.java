@@ -14,6 +14,7 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -40,7 +41,7 @@ public class ServerCommandRegistrar implements CommandRegistrar<ServerCommandSou
 				@Override
 				public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 					ScrollCommandContext<ServerCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<ServerCommandSource>(context, registrar);
-					if (environment.dedicated) { // Only permission checks on the server.
+					if (environment == RegistrationEnvironment.DEDICATED) { // Only permission checks on the server.
 						ServerCommandSource source = context.getSource();
 						if (command.getPermission() >= 0 && !source.hasPermissionLevel(command.getPermission())) {
 							source.sendError(command.getPermissionMessage());

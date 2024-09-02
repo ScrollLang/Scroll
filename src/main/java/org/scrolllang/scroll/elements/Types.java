@@ -52,7 +52,7 @@ public class Types {
 				.register();
 
 		registration.newType(ItemStack.class, "itemstack", "itemStack@s")
-				.toStringFunction(itemstack -> itemstack.getCount() + " " + Scroll.language("language.of") + " " + Registries.ITEM.getId(itemstack.getItem()).value())
+				.toStringFunction(itemstack -> itemstack.getCount() + " " + Scroll.language("language.of") + " " + Registries.ITEM.getId(itemstack.getItem()).getNamespace())
 				.register();
 
 		registration.newType(Location.class, "location", "location@s")
@@ -81,7 +81,7 @@ public class Types {
 						return null;
 					return itemRegistry.get(identifier);
 				})
-				.toStringFunction(item -> Registries.ITEM.getId(item).value())
+				.toStringFunction(item -> Registries.ITEM.getId(item).getNamespace())
 				.register();
 	}
 
