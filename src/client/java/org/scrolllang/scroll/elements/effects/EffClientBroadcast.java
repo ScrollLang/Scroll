@@ -46,7 +46,7 @@ public class EffClientBroadcast extends Effect implements Languaged {
 	@Override
 	protected void execute(TriggerContext context) {
 		ClientPlayerEntity player = ScrollClient.getClientPlayer();
-		if (player == null)
+		if (player == null || objects == null)
 			return;
 		for (Object object : objects.getArray(context)) {
 			Text text;

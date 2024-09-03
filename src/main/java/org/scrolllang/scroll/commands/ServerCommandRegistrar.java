@@ -57,7 +57,7 @@ public class ServerCommandRegistrar implements CommandRegistrar<ServerCommandSou
 			LiteralArgumentBuilder<ServerCommandSource> mainNode = literal(command.getName());
 			if (!command.getParameters().isEmpty()) {
 				for (CommandParameter<?> argument : command.getParameters()) {
-					mainNode.then(argument(argument.getIdentifier(), TextArgumentType.text()).executes(execute));
+					mainNode.then(argument(argument.getIdentifier(), TextArgumentType.text(registryAccess)).executes(execute));
 				}
 			}
 			dispatcher.register(mainNode.executes(execute));

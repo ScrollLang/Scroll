@@ -10,7 +10,7 @@ public class ScrollServer implements DedicatedServerModInitializer {
 
 	@Override
 	public void onInitializeServer() {
-		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			Scroll.ADVENTURE = FabricServerAudiences.of(server);
 			Scroll.SERVER = server;
 			ServerTypes.register(Scroll.getRegistration());

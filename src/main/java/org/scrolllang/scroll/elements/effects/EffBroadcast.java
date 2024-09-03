@@ -46,12 +46,15 @@ public class EffBroadcast extends Effect implements Languaged {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] expressions, int matchedPattern, ParseContext parseContext) {
 		objects = expressions[0];
-		worlds = (Expression<ServerWorld>) expressions[1];
+		if (expressions.length > 1)
+			worlds = (Expression<ServerWorld>) expressions[1];
 		return true;
 	}
 
 	@Override
 	protected void execute(TriggerContext context) {
+		if (objects == null)
+			return;
 		List<ServerCommandSource> receivers = new ArrayList<>();
 		if (worlds == null) {
 			MinecraftServer server = Scroll.getMinecraftServer();

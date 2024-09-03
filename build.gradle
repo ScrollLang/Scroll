@@ -1,11 +1,8 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '8.1.1'
-	id 'fabric-loom' version '1.4-SNAPSHOT'
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
-	id 'eclipse'
 	id 'java'
 }
 
@@ -48,7 +45,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Adventure API
-	modImplementation include("net.kyori:adventure-platform-fabric:5.9.0")
+	modImplementation include("net.kyori:adventure-platform-fabric:5.14.1")
 
 	// Reflections
 	modImplementation include('org.reflections:reflections:0.10.2')
@@ -60,7 +57,6 @@ dependencies {
 
 	// skript-parser
 	modImplementation include('org.scrolllang:skript-parser:alpha2')
-	//implementation include(project(':skript-parser'))
 
 }
 
@@ -95,13 +91,19 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+	it.options.release = 21
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

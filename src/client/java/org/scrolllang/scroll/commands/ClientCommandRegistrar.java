@@ -11,8 +11,9 @@ import org.scrolllang.scroll.language.Languaged;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.RootCommandNode;
 
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.PlayerManager;
@@ -31,31 +32,35 @@ public class ClientCommandRegistrar implements CommandRegistrar<FabricClientComm
 		}
 	}
 
+	private RootCommandNode<FabricClientCommandSource> root;
+
 	@Override
 	public void register(Command command) {
-		com.mojang.brigadier.Command<FabricClientCommandSource> execute = new com.mojang.brigadier.Command<>() {
-			@Override
-			public int run(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
-				ScrollCommandContext<FabricClientCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<FabricClientCommandSource>(context, registrar);
-				command.fill(commandContext);
-				// We still want to call the command context even if the command will be cancelled represented by a negative number. ScriptCommand handles not calling the trigger.
-				ScriptCommand.runTriggers(ScriptCommand.getTriggersList(), commandContext);
-				return commandContext.getReturnCode();
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			root = dispatcher.getRoot();
+			com.mojang.brigadier.Command<FabricClientCommandSource> execute = new com.mojang.brigadier.Command<>() {
+				@Override
+				public int run(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
+					ScrollCommandContext<FabricClientCommandSource> commandContext = new ScriptCommand.ScrollCommandContext<FabricClientCommandSource>(context, registrar);
+					command.fill(commandContext);
+					// We still want to call the command context even if the command will be cancelled represented by a negative number. ScriptCommand handles not calling the trigger.
+					ScriptCommand.runTriggers(ScriptCommand.getTriggersList(), commandContext);
+					return commandContext.getReturnCode();
+				}
+			};
+			LiteralArgumentBuilder<FabricClientCommandSource> mainNode = literal(command.getName());
+			if (!command.getParameters().isEmpty()) {
+				for (CommandParameter<?> argument : command.getParameters()) {
+					mainNode.then(argument(argument.getIdentifier(), TextArgumentType.text(registryAccess)));
+				}
 			}
-		};
-		LiteralArgumentBuilder<FabricClientCommandSource> mainNode = literal(command.getName());
-		if (!command.getParameters().isEmpty()) {
-			for (CommandParameter<?> argument : command.getParameters()) {
-				mainNode.then(argument(argument.getIdentifier(), TextArgumentType.text()));
-			}
-		}
-		mainNode.executes(execute);
-		ClientCommandManager.getActiveDispatcher().register(mainNode);
+			dispatcher.register(mainNode.executes(execute));
+		});
 	}
 
 	@Override
 	public void unregister(Command command) {
-		remover.removeCommand(command, ClientCommandManager.getActiveDispatcher().getRoot());
+		remover.removeCommand(command, root);
 		PlayerManager playerManager = Scroll.getMinecraftServer().getPlayerManager();
 		for (ServerPlayerEntity player : playerManager.getPlayerList())
 			playerManager.sendCommandTree(player);

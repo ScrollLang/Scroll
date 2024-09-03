@@ -91,7 +91,7 @@ public class ExprName extends PropertyExpression<Object, Text> implements Langua
 				case DISPLAY:
 					return entity.getDisplayName();
 				case ENTITY:
-					return Text.literal(entity.getEntityName());
+					return entity.getType().getName();
 				case NAME:
 					return entity.getName();
 				default:

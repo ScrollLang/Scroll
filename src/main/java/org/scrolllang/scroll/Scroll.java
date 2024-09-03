@@ -2,6 +2,7 @@ package org.scrolllang.scroll;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
@@ -60,18 +61,10 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	private static Path SCROLL_FOLDER;
 	private static Scroll INSTANCE;
 
-	private static final ScrollAddon SELF = new ScrollAddon("Scroll", 0) {
-
-		@Override
-		protected void startRegistration(ScrollRegistration registration) {
-
-		}
-
-	};
-
-	static final List<ScrollAddon> ADDONS = Lists.newArrayList(SELF);
+	static final List<ScrollAddon> ADDONS = new ArrayList<>();
 	static FabricAudiences ADVENTURE;
 	static MinecraftServer SERVER;
+	static ScrollAddon SELF;
 
 	@Override
 	public void onInitialize() {
@@ -102,6 +95,13 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 
 		SkriptLogger registrationLogger = new SkriptLogger(CONFIGURATION.isDebug());
 		REGISTRATION = new SkriptRegistration(this, registrationLogger);
+		SELF = new ScrollAddon("Scroll") {
+			@Override
+			public void startRegistration(ScrollRegistration registration) {
+
+			}
+		};
+		ADDONS.add(SELF);
 	}
 
 	/**

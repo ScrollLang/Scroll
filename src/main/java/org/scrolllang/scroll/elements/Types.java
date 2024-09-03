@@ -75,8 +75,14 @@ public class Types {
 		registration.newType(Item.class, "item", "item@s")
 				.literalParser(input -> {
 					input = input.replaceAll("\s", "_").toUpperCase(Locale.ENGLISH);
+					Identifier identifier;
+					if (!input.contains(":")) {
+						identifier = Identifier.of("minecraft", input);
+					} else {
+						String[] parts = input.split(":");
+						identifier = Identifier.of(parts[0], parts[1]);
+					}
 					Registry<Item> itemRegistry = Registries.ITEM;
-					Identifier identifier = new Identifier(input);
 					if (!itemRegistry.containsId(identifier))
 						return null;
 					return itemRegistry.get(identifier);
