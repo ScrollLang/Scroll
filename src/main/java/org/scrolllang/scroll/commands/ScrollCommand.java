@@ -94,7 +94,7 @@ public class ScrollCommand implements Languaged {
 												}
 											} catch (Exception e) {
 												Scroll.LOGGER.info("There was an error");
-												Scroll.printException(e);
+												Scroll.getInstance().printException(e);
 											}
 											break;
 									}

@@ -50,7 +50,7 @@ public class Configuration implements Reloadable {
 			this.toml = this.load();
 			return true;
 		} catch (IOException exception) {
-			Scroll.printException(exception, Scroll.languageFormat("scroll.reload.failed", "scroll/configuration.toml"));
+			Scroll.getInstance().printException(exception, Scroll.languageFormat("scroll.reload.failed", "scroll/configuration.toml"));
 			return false;
 		}
 	}

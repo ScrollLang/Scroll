@@ -20,8 +20,6 @@ import org.scrolllang.scroll.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-
 import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.lang.Trigger;
@@ -97,9 +95,10 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		REGISTRATION = new SkriptRegistration(this, registrationLogger);
 		SELF = new ScrollAddon("Scroll") {
 			@Override
-			public void startRegistration(ScrollRegistration registration) {
+			public void startRegistration(ScrollRegistration registration) {}
 
-			}
+			@Override
+			protected void initAddon() {}
 		};
 		ADDONS.add(SELF);
 	}
@@ -108,7 +107,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * Separated for client and server specific types to be registered before syntaxes.
 	 */
 	static void register() {
-		Parser.init(new String[0], new String[0], new String[0], true);
+		Parser.init(new String[0], new String[0], new String[0], true, SCROLL_FOLDER);
 
 		// Types must be before syntaxes.
 		Types.register(REGISTRATION);
@@ -193,7 +192,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		try {
 			return String.format(LANGUAGE.getOrDefaultEnglish(key), arguments);
 		} catch (UnknownFormatConversionException exception) {
-			printException(exception, "Potentially incorrect format in the language properties file.");
+			Scroll.getInstance().printException(exception, "Potentially incorrect format in the language properties file.");
 			return null;
 		}
 	}
@@ -404,7 +403,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param messages Optionally any messages to print along with the exception for descriptions.
 	 * @return an EmptyStacktraceException to throw if code execution should terminate.
 	 */
-	public static EmptyStacktraceException printException(Throwable throwable, String... messages) {
+	public EmptyStacktraceException printException(Throwable throwable, String... messages) {
 		return printException(SELF, throwable, messages);
 	}
 
@@ -415,7 +414,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param messages Optionally any messages to print along with the exception for descriptions.
 	 * @return an EmptyStacktraceException to throw if code execution should terminate.
 	 */
-	public static EmptyStacktraceException printException(ScrollAddon addon, Throwable throwable, String... messages) {
+	public EmptyStacktraceException printException(ScrollAddon addon, Throwable throwable, String... messages) {
 		return new ExceptionPrinter(addon, throwable, messages).print(LOGGER);
 	}
 
