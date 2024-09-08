@@ -138,14 +138,14 @@ public class ScrollScriptLoader {
 							try {
 								return Files.list(path);
 							} catch (IOException exception) {
-								Scroll.printException(exception, Scroll.languageFormat("files.read.directory", directory));
+								Scroll.getInstance().printException(exception, Scroll.languageFormat("files.read.directory", directory));
 								return Stream.empty();
 							}
 						return Stream.of(path);
 					})
 					.filter(filter);
 		} catch (IOException exception) {
-			Scroll.printException(exception, Scroll.languageFormat("files.read.directory", directory));
+			Scroll.getInstance().printException(exception, Scroll.languageFormat("files.read.directory", directory));
 			return Stream.empty();
 		}
 	}
@@ -252,7 +252,7 @@ public class ScrollScriptLoader {
 			Scroll.LOGGER.error(Scroll.languageFormat("scripts.loading.timeout", path.getFileName()));
 			return Optional.empty();
 		} catch (ExecutionException exception) {
-			Scroll.printException(exception, Scroll.languageFormat("scripts.parse.exception", path.getFileName()));
+			Scroll.getInstance().printException(exception, Scroll.languageFormat("scripts.parse.exception", path.getFileName()));
 			return Optional.empty();
 		}
 		CURRENT_SCRIPT = null;

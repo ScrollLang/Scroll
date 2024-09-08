@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
+import org.scrolllang.scroll.exceptions.EmptyStacktraceException;
+import org.scrolllang.scroll.log.ExceptionPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +59,14 @@ public abstract class ScrollAddon {
 		try {
 			FileUtils.loadClasses(FileUtils.getJarFile(getClass()), mainPackage, subPackages);
 		} catch (IOException | URISyntaxException exception) {
-			Scroll.printException(exception, "Failed to initalize classes from addon " + name + "");
+			printException(exception, "Failed to initalize classes from addon " + name + "");
 		}
 	}
+
+	/**
+	 * Called when the addon is loaded by Scroll.
+	 */
+	protected abstract void initAddon();
 
 	/**
 	 * Called when you can safely start registering syntaxes.
@@ -77,6 +84,10 @@ public abstract class ScrollAddon {
 	 */
 	public Path getDataFolder() {
 		return Scroll.getInstance().getAddonsFolder().resolve(name);
+	}
+
+	public EmptyStacktraceException printException(Exception exception, String message) {
+		return new ExceptionPrinter(this, exception, message).print(logger);
 	}
 
 	public void info(String message) {

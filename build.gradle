@@ -1,6 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
+	id 'com.gradleup.shadow' version '8.3.0'
 	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 	id 'java'
@@ -8,6 +9,10 @@ plugins {
 
 compileTestJava.options.encoding = 'UTF-8'
 compileJava.options.encoding = 'UTF-8'
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
 
 base {
 	archivesName = project.archives_base_name
@@ -56,7 +61,7 @@ dependencies {
 	modImplementation include('org.antlr:antlr4-runtime:4.13.2')
 
 	// skript-parser
-	modImplementation include('org.scrolllang:skript-parser:alpha2')
+	modImplementation include('org.scrolllang:skript-parser:alpha5')
 
 }
 
@@ -116,4 +121,8 @@ jar {
 
 processResources {
 	filter ReplaceTokens, tokens: ["version": project.property("version")]
+}
+
+shadowJar {
+	minimize()
 }

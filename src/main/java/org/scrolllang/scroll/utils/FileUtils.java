@@ -20,7 +20,7 @@ public class FileUtils {
 			try {
 				return Files.createDirectories(path);
 			} catch (IOException exception) {
-				throw Scroll.printException(exception, Scroll.languageFormat("files.create.directory", path.getFileName()));
+				throw Scroll.getInstance().printException(exception, Scroll.languageFormat("files.create.directory", path.getFileName()));
 			}
 		}
 		return path;

@@ -56,7 +56,7 @@ public class Language implements Reloadable {
 						try {
 							Files.copy(path, language);
 						} catch (IOException exception) {
-							Scroll.printException(exception, Scroll.languageFormat("language.failed.copy", path.getFileName()));
+							Scroll.getInstance().printException(exception, Scroll.languageFormat("language.failed.copy", path.getFileName()));
 						}
 					}
 				});
@@ -99,7 +99,7 @@ public class Language implements Reloadable {
 			this.english = this.loadEnglish();
 			return true;
 		} catch (InvalidPathException | IOException exception) {
-			Scroll.printException(exception, Scroll.languageFormat("language.reload.fail", "scroll/configuration.toml"));
+			Scroll.getInstance().printException(exception, Scroll.languageFormat("language.reload.fail", "scroll/configuration.toml"));
 			return false;
 		}
 	}
