@@ -8,15 +8,15 @@ Documentation will be coming when in a releasable state.
 Mention me `limeglass` on SkUnity Discord for any information.
 
 ### Requirements
-- Fabric API (Currently 0.88 but not locked in this version)
-- Minecraft (Currently 1.20.1 but not locked and only supporting this version currently)
-- Java 17+
+- Fabric API (Currently 0.103.0+1.21.1)
+- Minecraft (Currently 1.21.1)
+- Java 21+
 
 ---
 
 ## Contributing
 
-Pull requests open.
+Pull requests always open.
 
 skript-parser uses GitHub packages, and is required by Scroll.
 
@@ -24,7 +24,7 @@ To download GitHub packages you'll have to include your GitHub username and a Gi
 
 See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for how to obtain a token (you'll only need permission read:packages).
 
-Add this to a gradle.properties at your gradle global cache C:/Users/USER/.gradle/gradle.properties or in the gradle.properties of the project. Preferably the first latter to avoid pushing tokens.
+Add this to a gradle.properties at your gradle global cache (Windows users: C:/Users/USER/.gradle/gradle.properties)
 ```
 scrollUsername=USERNAME
 scrollPassword=githubToken
@@ -34,7 +34,6 @@ scrollPassword=githubToken
 ```
 git clone https://github.com/TheLimeGlass/Scroll
 cd /Scroll
-git submodule update --init --recursive
 gradlew clean genSources
 gradlew build
 ```
@@ -45,12 +44,6 @@ You must generate the Minecraft sources with the genSources command to be able t
 gradlew runClient
 gradlew runServer
 ```
-
-### Updating your local branch of Scroll with the latest skript-parser commit
-```
-git submodule update --recursive --remote
-```
-This is assuming you executed `git submodule update --init --recursive` before, as this must be done before running this command.
 
 ### Code Conventions
 Scroll follows Skript's code conventions excluding the section about License
