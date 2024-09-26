@@ -31,7 +31,7 @@ import java.util.List;
         "The event is hooked in before the spectator check, so make sure",
         "to check for the player's game mode as well!"
 })
-@Since("INSERT VERSION")
+@Since("1.21.1+dev.2")
 public class EvtAttackEntity extends ScrollEvent {
 
     // Required Context triggers methods. Start.
