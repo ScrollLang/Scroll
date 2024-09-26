@@ -62,22 +62,24 @@ public class ExceptionPrinter extends CommonPrinter {
 		mods.forEach(modDetails -> logEx(modDetails));
 		ModMetadata scroll = FabricLoader.getInstance().getModContainer("scroll").orElseThrow().getMetadata();
 
-		if (scroll.getVersion().toString().contains("nightly")) {
-			logEx("You're running a (buggy) nightly version of Scroll.");
-			logEx("If this is not a test server, switch to a more stable release NOW!");
-			logEx("Your players are unlikely to appreciate crashes and/or data loss due to Scroll bugs.");
-			logEx("");
-			logEx("Just testing things? Good. Please report this bug, so that we can fix it before a stable release.");
-			logEx("Issue tracker: " + REPORT_URL);
-//		} else if (updater != null && updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
-//			logEx("You're running outdated version of Scroll! Please try updating it NOW; it might fix this issue.");
-//			logEx("Run /sc update check to get a download link to latest Scroll!");
-//			logEx("You will be given instructions how to report this error if it persists after update.");
-		} else {
-			logEx("Something went horribly wrong with Scroll.");
-			logEx("This issue is NOT your fault! You probably can't fix it yourself, either.");
-			logEx("You should report it at " + REPORT_URL + ". Please copy paste this report there (or use a paste service).");
-			logEx("This ensures that your issue is noticed and will be fixed as soon as possible.");
+		if (addon.getName().equals("scroll")) {
+			if (scroll.getVersion().toString().contains("nightly")) {
+				logEx("You're running a (buggy) nightly version of Scroll.");
+				logEx("If this is not a test server, switch to a more stable release NOW!");
+				logEx("Your players are unlikely to appreciate crashes and/or data loss due to Scroll bugs.");
+				logEx("");
+				logEx("Just testing things? Good. Please report this bug, so that we can fix it before a stable release.");
+				logEx("Issue tracker: " + addon.getReportURL() == null ? "https://github.com/ScrollLang/Scroll/issues" : addon.getReportURL());
+	//		} else if (updater != null && updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
+	//			logEx("You're running outdated version of Scroll! Please try updating it NOW; it might fix this issue.");
+	//			logEx("Run /sc update check to get a download link to latest Scroll!");
+	//			logEx("You will be given instructions how to report this error if it persists after update.");
+			} else {
+				logEx("Something went horribly wrong with Scroll.");
+				logEx("This issue is NOT your fault! You probably can't fix it yourself, either.");
+				logEx("You should report it at " + (addon.getReportURL() == null ? "https://github.com/ScrollLang/Scroll/issues" : addon.getReportURL()) + ". Please copy paste this report there (or use a paste service).");
+				logEx("This ensures that your issue is noticed and will be fixed as soon as possible.");
+			}
 		}
 
 		logEx();
