@@ -32,7 +32,7 @@ scrollPassword=githubToken
 
 ### Setup
 ```
-git clone https://github.com/TheLimeGlass/Scroll
+git clone https://github.com/ScrollLang/Scroll
 cd /Scroll
 gradlew clean genSources
 gradlew build
