@@ -33,6 +33,7 @@ jobs:
         with:
           find: "INSERT VERSION"
           replace: "${{ steps.getversion.outputs.version }}"
+          exclude: . # Do not modify this file
           regex: false
       - name: Commit changes
         if: steps.check-version-length.outputs.failure != 'true'
