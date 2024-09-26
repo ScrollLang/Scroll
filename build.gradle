@@ -99,6 +99,11 @@ processResources {
 	}
 }
 
+tasks.build.doFirst {
+	def versionFile = file('VERSION')
+	versionFile.text = project.version
+}
+
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 21
 }

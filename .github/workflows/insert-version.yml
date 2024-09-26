@@ -1,0 +1,42 @@
+
+name: insert version
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Read VERSION file
+        id: getversion
+        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+      - name: Check version length
+        id: check-version-length
+        run: |
+          if [ ${#version} -gt 10 ]; then
+            echo "failure=true" >> "$GITHUB_OUTPUT"
+            gh run cancel ${{ github.run_id }}
+            exit 1
+          fi
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "INSERT VERSION"
+          replace: "${{ steps.getversion.outputs.version }}"
+          regex: false
+      - name: Commit changes
+        if: steps.check-version-length.outputs.failure != 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        id: auto-commit-action
+        with:
+          commit_message: Insert Version
