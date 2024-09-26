@@ -1,0 +1,32 @@
+
+// Done to allow Dependabot scanning
+
+ext {
+	// Fabric Properties
+	// check these on https://fabricmc.net/develop
+	minecraft_version = '1.21.1'
+	yarn_mappings = '1.21.1+build.3'
+	loader_version = '0.16.3'
+
+	// Fabric api
+	fabric_version = '0.103.0+1.21.1'
+
+	// Mod Properties
+	mod_version = '1.21.1+dev.2'
+	maven_group = 'org.scrolllang.scroll'
+	archives_base_name = 'Scroll'
+
+	// Adventure API
+	adventure_version = '5.14.1'
+
+	// Reflections
+	reflections_version = '0.10.2'
+	javassist_version = '3.30.2-GA'
+
+	// TOML
+	toml_version = '1.1.1'
+	antlr_version = '4.13.2'
+
+	// skript-parser
+	skript_parser_version = 'alpha5'
+}

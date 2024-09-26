@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
+import org.jetbrains.annotations.Nullable;
 import org.scrolllang.scroll.exceptions.EmptyStacktraceException;
 import org.scrolllang.scroll.log.ExceptionPrinter;
 import org.slf4j.Logger;
@@ -100,6 +101,14 @@ public abstract class ScrollAddon {
 
 	public void error(String message) {
 		logger.error(message);
+	}
+
+	/**
+	 * @return The URL to the report of this addon.
+	 */
+	@Nullable
+	public String getReportURL() {
+		return null;
 	}
 
 	/**
