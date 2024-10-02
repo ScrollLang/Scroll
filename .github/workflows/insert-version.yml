@@ -8,15 +8,29 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
-
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v3
+      - name: setup jdk
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        if: runner.os != 'Windows'
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+        env:
+          PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
+          PACKAGES_KEY: ${{ secrets.PACKAGES_KEY }}
       - name: Read VERSION file
         id: getversion
         run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
