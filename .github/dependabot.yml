@@ -13,6 +13,7 @@ updates:
     labels:
       - "dependencies"
   - package-ecosystem: "gradle"
+    registries: "*"
     directory: "/"
     schedule:
         interval: "daily"
