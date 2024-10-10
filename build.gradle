@@ -24,9 +24,7 @@ base {
 
 repositories {
 	mavenCentral()
-	maven {
-		url = 'https://maven.fabricmc.net'
-	}
+	maven { url 'https://maven.fabricmc.net' }
 	maven {
 		url = 'https://maven.pkg.github.com/ScrollLang/skript-parser'
 		credentials {
