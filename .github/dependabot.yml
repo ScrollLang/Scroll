@@ -1,4 +1,10 @@
 version: 2
+registries:
+  skript-parser:
+    type: maven-repository
+    url: https://maven.pkg.github.com/ScrollLang/skript-parser
+    username: ${{ secrets.PACKAGES_USER }}
+    password: ${{ secrets.PACKAGES_KEY }}
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
