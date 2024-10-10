@@ -12,7 +12,7 @@ ext {
 	fabric_version = '0.105.3+'
 
 	// Mod Properties
-	mod_version = '1.21.1+dev.2'
+	mod_version = '1.21.1+dev.3'
 	maven_group = 'org.scrolllang.scroll'
 	archives_base_name = 'Scroll'
 
