@@ -15,12 +15,6 @@ jobs:
         # and run on both Linux and Windows
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-      # 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
