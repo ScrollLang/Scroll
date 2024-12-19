@@ -18,9 +18,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.PACKAGES_WRITE }}
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v3
       - name: setup jdk ${{ matrix.java }}
@@ -35,4 +32,4 @@ jobs:
         run: ./gradlew publish
         env:
           PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
-          PACKAGES_KEY: ${{ secrets.PACKAGES_KEY }}
+          PACKAGES_KEY: ${{ secrets.PACKAGES_WRITE }}
