@@ -20,6 +20,10 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "current"
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v3
       - name: setup jdk ${{ matrix.java }}
@@ -27,11 +31,8 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        if: runner.os != 'Windows'
-        run: chmod +x ./gradlew
       - name: build
-        run: ./gradlew build
+        run: gradle build
         env:
           PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
           PACKAGES_KEY: ${{ secrets.PACKAGES_KEY }}
