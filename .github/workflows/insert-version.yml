@@ -55,4 +55,3 @@ jobs:
         id: auto-commit-action
         with:
           commit_message: "Insert Version ${{ steps.getversion.outputs.version }}"
-          push_options: --force
