@@ -27,6 +27,7 @@ jobs:
           distribution: 'microsoft'
           check-latest: true
       - name: publish
+        if: success() || failure()
         run: gradle publish
         env:
           PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
