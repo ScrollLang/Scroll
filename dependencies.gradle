@@ -12,12 +12,12 @@ ext {
 	fabric_version = '0.109.1+'
 
 	// Mod Properties
-	mod_version = '1.21.4+dev.1'
+	mod_version = 'dev.1+1.21.4'
 	maven_group = 'org.scrolllang.scroll'
 	archives_base_name = 'Scroll'
 
 	// Adventure API
-	adventure_version = '5.14.2'
+	adventure_version = '6.2.0'
 
 	// Reflections
 	reflections_version = '0.10.2'
