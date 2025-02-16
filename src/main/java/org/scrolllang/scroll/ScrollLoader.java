@@ -37,7 +37,7 @@ import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
- * Main class for handling loading .scroll files to skript-parser.
+ * Main class for handling loading .scroll files to the skript-parser.
  */
 public class ScrollLoader {
 
@@ -159,7 +159,7 @@ public class ScrollLoader {
 	 */
 	@NotNull
 	@Internal
-	static List<Script> loadScriptsDirectory(Path scriptsPath) {
+	static List<Script> loadScriptsAtDirectory(Path scriptsPath) {
 		if (!Files.isDirectory(scriptsPath)) {
 			Scroll.LOGGER.error(Scroll.language("scripts.load.internal.scripts"));
 			return new ArrayList<>();

@@ -142,7 +142,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				Parser.printLogs(registration.register(), Calendar.getInstance(), true);
 			});
 
-		ScrollLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
+		ScrollLoader.loadScriptsAtDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
 	}
 
