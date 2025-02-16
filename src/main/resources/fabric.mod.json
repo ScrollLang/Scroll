@@ -3,10 +3,10 @@
 	"id": "scroll",
 	"version": "${version}",
 	"name": "Scroll",
-	"description": "A Skript loader for the Fabric API",
+	"description": "Skript language for Fabric API",
 	"authors": [
 		"LimeGlass",
-		"Scroll Language"
+		"ScrollLang"
 	],
 	"contact": {
 		"homepage": "https://scroll-lang.org",
@@ -28,7 +28,7 @@
 	},
 	"depends": {
 		"fabricloader": "*",
-		"minecraft": "~1.21.1",
+		"minecraft": "~1.21.4",
 		"java": ">=21",
 		"fabric-api": "*"
 	}
