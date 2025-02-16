@@ -27,9 +27,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "current"
-      # Gradle 8.12.1 is not updated on the validation tool yet. Reported it on their GitHub page.
-      #- name: validate gradle wrapper
-      #  uses: gradle/wrapper-validation-action@v3
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v3
       - name: setup jdk ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
