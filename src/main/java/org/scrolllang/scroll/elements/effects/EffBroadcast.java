@@ -70,7 +70,7 @@ public class EffBroadcast extends Effect implements Languaged {
 			if (object instanceof Text) {
 				text = (Text) object;
 			} else if (object instanceof Component) {
-				text = Scroll.getAdventure().toNative((TextComponent) object);
+				text = Scroll.getAdventure().asNative((TextComponent) object);
 			} else {
 				String message = object instanceof String ? (String) object : TypeManager.toString(CollectionUtils.array(object));
 				text = Text.literal(message);

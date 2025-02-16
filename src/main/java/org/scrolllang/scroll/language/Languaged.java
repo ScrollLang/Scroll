@@ -10,7 +10,7 @@ import io.github.syst3ms.skriptparser.lang.Trigger;
 import io.github.syst3ms.skriptparser.log.ErrorType;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.registration.SkriptEventInfo;
-import net.kyori.adventure.platform.fabric.FabricAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.text.Text;
 
@@ -51,11 +51,11 @@ public interface Languaged {
 
 	default Text adventure(LangNode node) {
 		MiniMessage miniMessage = MiniMessage.miniMessage();
-		FabricAudiences adventure = Scroll.getAdventure();
+		MinecraftAudiences adventure = Scroll.getAdventure();
 		String string = languageFormat(node);
 		if (string == null)
 			return Text.literal(node.node());
-		return adventure.toNative(miniMessage.deserialize(languageFormat(node)));
+		return adventure.asNative(miniMessage.deserialize(languageFormat(node)));
 	}
 
 	/**

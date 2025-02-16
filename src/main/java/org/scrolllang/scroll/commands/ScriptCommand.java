@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.scrolllang.scroll.Scroll;
-import org.scrolllang.scroll.ScrollScriptLoader;
+import org.scrolllang.scroll.ScrollLoader;
 import org.scrolllang.scroll.commands.arguments.CommandParameter;
 import org.scrolllang.scroll.exceptions.ScrollAPIException;
 import org.scrolllang.scroll.language.Languaged;
@@ -223,7 +223,7 @@ public class ScriptCommand extends ScrollEvent implements Languaged {
 			}
 		}
 		this.command = new Command(commandName, parameters, aliases, client, permission, permissionMessage, usage);
-		if (!CommandManager.register(ScrollScriptLoader.getCurrentlyLoadingScript(), command)) {
+		if (!CommandManager.register(ScrollLoader.getCurrentlyLoadingScript(), command)) {
 			error(parseContext, node("scripts.commands.register.failed", commandName));
 			return false;
 		}

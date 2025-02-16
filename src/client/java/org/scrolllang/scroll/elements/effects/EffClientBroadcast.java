@@ -53,14 +53,14 @@ public class EffClientBroadcast extends Effect implements Languaged {
 			if (object instanceof Text) {
 				text = (Text) object;
 			} else if (object instanceof Component) {
-				text = Scroll.getAdventure().toNative((TextComponent) object);
+				text = ScrollClient.getClientAdventure().asNative((TextComponent) object);
 			} else {
 				String message = object instanceof String ? (String) object : TypeManager.toString(CollectionUtils.array(object));
 				text = Text.literal(message);
 			}
 			if (text == null)
 				continue;
-			player.sendMessage(text);
+			player.sendMessage(text, true);
 		}
 	}
 

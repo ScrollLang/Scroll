@@ -19,7 +19,7 @@ import net.minecraft.text.Text;
 
 public class Command {
 
-	private static final Text DEFAULT_PERMISSION_MESSAGE = Scroll.getAdventure().toNative(MiniMessage.miniMessage().deserialize(Scroll.language("scripts.commands.no.permissions")));
+	private static final Text DEFAULT_PERMISSION_MESSAGE = Scroll.getAdventure().asNative(MiniMessage.miniMessage().deserialize(Scroll.language("scripts.commands.no.permissions")));
 
 	private final List<CommandParameter<?>> parameters = new ArrayList<>();
 	private final List<CommandArgument<?>> arguments = new ArrayList<>();

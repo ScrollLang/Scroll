@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.scrolllang.scroll.Scroll;
-import org.scrolllang.scroll.ScrollScriptLoader;
+import org.scrolllang.scroll.ScrollLoader;
 import org.scrolllang.scroll.language.Languaged;
 import org.scrolllang.scroll.script.Script;
 
@@ -83,11 +83,11 @@ public class ScrollCommand implements Languaged {
 											}
 											break;
 										default:
-											Optional<Script> script = ScrollScriptLoader.getScriptByName(argument);
+											Optional<Script> script = ScrollLoader.getScriptByName(argument);
 											try {
 												if (!script.isPresent()) {
 													context.getSource().sendMessage(Scroll.adventure("scripts.doesnt.exist", argument));
-												} else if (ScrollScriptLoader.reloadScript(script.get()).isPresent()) {
+												} else if (ScrollLoader.reloadScript(script.get()).isPresent()) {
 													context.getSource().sendMessage(Scroll.adventure("scripts.reload.success", argument));
 												} else {
 													context.getSource().sendMessage(Scroll.adventure("scripts.reload.failed", argument));
@@ -105,11 +105,11 @@ public class ScrollCommand implements Languaged {
 								.suggests(DISABLED_SUGGESTS)
 								.executes(context -> {
 									String argument = context.getArgument("file", String.class);
-									Optional<Script> script = ScrollScriptLoader.getScriptByName(argument);
+									Optional<Script> script = ScrollLoader.getScriptByName(argument);
 									if (!script.isPresent()) {
 										context.getSource().sendMessage(Scroll.adventure("scripts.doesnt.exist", argument));
 									} else {
-										ScrollScriptLoader.disableScript(script.get());
+										ScrollLoader.disableScript(script.get());
 										context.getSource().sendMessage(Scroll.adventure("scripts.disable.success", argument));
 									}
 									return 0;
@@ -119,11 +119,11 @@ public class ScrollCommand implements Languaged {
 									.suggests(ENABLE_SUGGESTS)
 									.executes(context -> {
 										String argument = context.getArgument("file", String.class);
-										if (!argument.startsWith(ScrollScriptLoader.DISABLED_PREFIX))
-											argument = ScrollScriptLoader.DISABLED_PREFIX + argument;
-										if (!argument.endsWith(ScrollScriptLoader.EXTENSION))
-											argument = argument + ScrollScriptLoader.EXTENSION;
-										if (!ScrollScriptLoader.enableScriptAt(ScrollScriptLoader.getScriptsFolder().resolve(argument)).isPresent()) {
+										if (!argument.startsWith(ScrollLoader.DISABLED_PREFIX))
+											argument = ScrollLoader.DISABLED_PREFIX + argument;
+										if (!argument.endsWith(ScrollLoader.EXTENSION))
+											argument = argument + ScrollLoader.EXTENSION;
+										if (!ScrollLoader.enableScriptAt(ScrollLoader.getScriptsFolder().resolve(argument)).isPresent()) {
 											context.getSource().sendMessage(Scroll.adventure("scripts.doesnt.exist", argument));
 										} else {
 											context.getSource().sendMessage(Scroll.adventure("scripts.enable.success", argument));
@@ -149,22 +149,22 @@ public class ScrollCommand implements Languaged {
 	}
 
 	private static Stream<String> collectDisabledScripts() {
-		Stream<String> stream = ScrollScriptLoader.collectScriptsAt(ScrollScriptLoader.getScriptsFolder(), path -> path.getFileName().toString().startsWith(ScrollScriptLoader.DISABLED_PREFIX))
+		Stream<String> stream = ScrollLoader.collectScriptsAt(ScrollLoader.getScriptsFolder(), path -> path.getFileName().toString().startsWith(ScrollLoader.DISABLED_PREFIX))
 				.map(Path::getFileName)
 				.map(Path::toString);
 		if (REMOVE_DISABLED_PREFIX)
 			stream = stream
-					.filter(name -> name.startsWith(ScrollScriptLoader.DISABLED_PREFIX))
-					.map(name -> name.substring(0, name.lastIndexOf(ScrollScriptLoader.DISABLED_PREFIX)));
+					.filter(name -> name.startsWith(ScrollLoader.DISABLED_PREFIX))
+					.map(name -> name.substring(0, name.lastIndexOf(ScrollLoader.DISABLED_PREFIX)));
 		if (HIDE_EXTENSIONS)
-			return stream.map(name -> name.substring(0, name.lastIndexOf(ScrollScriptLoader.EXTENSION)));
+			return stream.map(name -> name.substring(0, name.lastIndexOf(ScrollLoader.EXTENSION)));
 		return stream;
 	}
 
 	private static Stream<String> collectScripts() {
 		if (HIDE_EXTENSIONS)
-			return ScrollScriptLoader.getLoadedScripts().stream().map(Script::getSimpleName);
-		return ScrollScriptLoader.getLoadedScripts().stream().map(Script::getFileName);
+			return ScrollLoader.getLoadedScripts().stream().map(Script::getSimpleName);
+		return ScrollLoader.getLoadedScripts().stream().map(Script::getFileName);
 	}
 
 	private static Stream<String> collectReload() {

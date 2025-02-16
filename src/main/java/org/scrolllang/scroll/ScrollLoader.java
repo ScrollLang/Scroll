@@ -37,9 +37,9 @@ import io.github.syst3ms.skriptparser.parsing.ScriptLoader;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
- * Main class for handling loading to skript-parser.
+ * Main class for handling loading .scroll files to skript-parser.
  */
-public class ScrollScriptLoader {
+public class ScrollLoader {
 
 	private static Path SCRIPTS_FOLDER = FileUtils.getOrCreateDir(FabricLoader.getInstance().getGameDir().resolve("scroll/scripts"));
 
@@ -112,7 +112,7 @@ public class ScrollScriptLoader {
 	 */
 	@NotNull
 	public static Stream<Path> collectScriptsAt(Path directory) {
-		return collectScriptsAt(directory, ScrollScriptLoader::validateScriptAt);
+		return collectScriptsAt(directory, ScrollLoader::validateScriptAt);
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class ScrollScriptLoader {
 		SCRIPTS_FOLDER = scriptsPath;
 		List<Script> scripts = collectScriptsAt(scriptsPath)
 				.parallel()
-				.map(ScrollScriptLoader::loadScriptAt)
+				.map(ScrollLoader::loadScriptAt)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(Collectors.toList());
@@ -273,7 +273,7 @@ public class ScrollScriptLoader {
 			return new ArrayList<>();
 		}
 		return collectScriptsAt(directory)
-				.map(ScrollScriptLoader::loadScriptAt)
+				.map(ScrollLoader::loadScriptAt)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(Collectors.toList());
@@ -297,7 +297,7 @@ public class ScrollScriptLoader {
 	 */
 	public static List<Script> reloadScripts(Collection<Script> scripts) {
 		return scripts.stream()
-				.map(ScrollScriptLoader::reloadScript)
+				.map(ScrollLoader::reloadScript)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(Collectors.toList());
@@ -327,7 +327,7 @@ public class ScrollScriptLoader {
 	 * @param scripts Collection of scripts to disable.
 	 */
 	public static void disableScripts(Collection<Script> scripts) {
-		scripts.stream().forEach(ScrollScriptLoader::disableScript);
+		scripts.stream().forEach(ScrollLoader::disableScript);
 	}
 
 	/**
@@ -361,7 +361,7 @@ public class ScrollScriptLoader {
 	 * @param paths Collection of paths to the scripts to enable. All scripts must have the disabled script prefix.
 	 */
 	public static void enableScriptsAt(Collection<Path> paths) {
-		paths.stream().forEach(ScrollScriptLoader::enableScriptAt);
+		paths.stream().forEach(ScrollLoader::enableScriptAt);
 	}
 
 	/**

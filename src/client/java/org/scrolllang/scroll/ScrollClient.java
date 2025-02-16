@@ -7,14 +7,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.kyori.adventure.platform.fabric.FabricClientAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftClientAudiences;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 @Environment(EnvType.CLIENT)
 public class ScrollClient implements ClientModInitializer {
 
-	private static FabricClientAudiences ADVENTURE;
+	private static MinecraftClientAudiences ADVENTURE;
 	private static MinecraftClient CLIENT;
 
 	@Override
@@ -22,7 +22,7 @@ public class ScrollClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			CLIENT = client;
 		});
-		ADVENTURE = FabricClientAudiences.of();
+		ADVENTURE = MinecraftClientAudiences.of();
 		Scroll.setAdventure(ADVENTURE);
 
 		ClientTypes.register(Scroll.getRegistration());
@@ -30,9 +30,9 @@ public class ScrollClient implements ClientModInitializer {
 	}
 
 	/**
-	 * @return {@link FabricClientAudiences} reference being the client.
+	 * @return {@link MinecraftClientAudiences} reference being the client.
 	 */
-	public static FabricClientAudiences getClientAdventure() {
+	public static MinecraftClientAudiences getClientAdventure() {
 		return ADVENTURE;
 	}
 

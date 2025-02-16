@@ -6,7 +6,7 @@ import org.scrolllang.scroll.Scroll;
 import org.scrolllang.scroll.objects.Location;
 
 import io.github.syst3ms.skriptparser.registration.SkriptRegistration;
-import net.kyori.adventure.platform.fabric.FabricAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
@@ -37,8 +37,8 @@ public class Types {
 		registration.newType(Text.class, "text", "text@s")
 				.literalParser(input -> {
 					MiniMessage miniMessage = MiniMessage.miniMessage();
-					FabricAudiences adventure = Scroll.getAdventure();
-					return adventure.toNative(miniMessage.deserialize(input));
+					MinecraftAudiences adventure = Scroll.getAdventure();
+					return adventure.asNative(miniMessage.deserialize(input));
 				})
 				.toStringFunction(Text::getString)
 				.register();

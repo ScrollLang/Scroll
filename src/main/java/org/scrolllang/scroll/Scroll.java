@@ -36,14 +36,15 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.kyori.adventure.platform.fabric.FabricAudiences;
-import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftClientAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 
 /**
- * Main class for Scroll for all environments.
+ * Main class of Scroll for all environments.
  */
 public class Scroll extends SkriptAddon implements ModInitializer {
 
@@ -60,7 +61,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	private static Scroll INSTANCE;
 
 	static final List<ScrollAddon> ADDONS = new ArrayList<>();
-	static FabricAudiences ADVENTURE;
+	static MinecraftAudiences ADVENTURE;
 	static MinecraftServer SERVER;
 	static ScrollAddon SELF;
 
@@ -83,7 +84,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		}
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-			ADVENTURE = FabricServerAudiences.of(server);
+			ADVENTURE = MinecraftServerAudiences.of(server);
 			SERVER = server;
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
@@ -141,7 +142,7 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 				Parser.printLogs(registration.register(), Calendar.getInstance(), true);
 			});
 
-		ScrollScriptLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
+		ScrollLoader.loadScriptsDirectory(FileUtils.getOrCreateDir(SCROLL_FOLDER.resolve("scripts")));
 		// TODO Deal with triggers not getting cleared after a reload.
 	}
 
@@ -153,19 +154,18 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 		return SERVER;
 	}
 
-	static <A extends FabricAudiences> void setAdventure(A adventure) {
+	static void setAdventure(MinecraftAudiences adventure) {
 		Scroll.ADVENTURE = adventure;
 	}
 
 	/**
-	 * Returns the {@link FabricAudiences} for Adventure API.
-	 * Will be {@link net.kyori.adventure.platform.fabric.FabricClientAudiences} for the client and {@link FabricServerAudiences} for the server.
+	 * Returns the {@link MinecraftAudiences} for Adventure API.
+	 * Will be {@link MinecraftClientAudiences} for the client and {@link MinecraftServerAudiences} for the server.
 	 * Cast appropriately depending on {@link #isServerEnvironment()}.
 	 */
 	@Nullable
-	@SuppressWarnings("unchecked")
-	public static <A extends FabricAudiences> A getAdventure() {
-		return (@Nullable A) ADVENTURE;
+	public static MinecraftAudiences getAdventure() {
+		return ADVENTURE;
 	}
 
 	/**
@@ -199,11 +199,11 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 
 	public static Text adventure(String node, Object... arguments) {
 		MiniMessage miniMessage = MiniMessage.miniMessage();
-		FabricAudiences adventure = Scroll.getAdventure();
+		MinecraftAudiences adventure = Scroll.getAdventure();
 		String string = languageFormat(node, arguments);
 		if (string == null)
 			return Text.literal(node);
-		return adventure.toNative(miniMessage.deserialize(string));
+		return adventure.asNative(miniMessage.deserialize(string));
 	}
 
 	/**
@@ -252,8 +252,8 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param tip A hint to provide to the Scroll user for the error.
 	 */
 	public static void error(String message, ErrorType type, @Nullable String tip) {
-		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
-			ScrollScriptLoader.CURRENT_LOGGER.error(message, type, tip);
+		if (ScrollLoader.CURRENT_LOGGER != null) {
+			ScrollLoader.CURRENT_LOGGER.error(message, type, tip);
 			return;
 		}
 		LOGGER.error(message);
@@ -267,8 +267,8 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param message The message to print.
 	 */
 	public static void info(String message) {
-		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
-			ScrollScriptLoader.CURRENT_LOGGER.info(message);
+		if (ScrollLoader.CURRENT_LOGGER != null) {
+			ScrollLoader.CURRENT_LOGGER.info(message);
 			return;
 		}
 		LOGGER.info(message);
@@ -282,8 +282,8 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param message The message to print.
 	 */
 	public static void warning(String message) {
-		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
-			ScrollScriptLoader.CURRENT_LOGGER.warn(message);
+		if (ScrollLoader.CURRENT_LOGGER != null) {
+			ScrollLoader.CURRENT_LOGGER.warn(message);
 			return;
 		}
 		LOGGER.warn(message);
@@ -298,8 +298,8 @@ public class Scroll extends SkriptAddon implements ModInitializer {
 	 * @param tip A hint to provide to the Scroll user for the error.
 	 */
 	public static void warning(String message, @Nullable String tip) {
-		if (ScrollScriptLoader.CURRENT_LOGGER != null) {
-			ScrollScriptLoader.CURRENT_LOGGER.warn(message, tip);
+		if (ScrollLoader.CURRENT_LOGGER != null) {
+			ScrollLoader.CURRENT_LOGGER.warn(message, tip);
 			return;
 		}
 		LOGGER.warn(message);

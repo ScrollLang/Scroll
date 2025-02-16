@@ -12,7 +12,7 @@ import org.scrolllang.scroll.language.Languaged;
 import io.github.syst3ms.skriptparser.lang.Expression;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
-import net.kyori.adventure.platform.fabric.FabricAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.text.Text;
 
@@ -27,7 +27,7 @@ public class ExprFormatted implements Expression<Text>, Languaged {
 	}
 
 	private final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-	private final FabricAudiences ADVENTURE = Scroll.getAdventure();
+	private final MinecraftAudiences ADVENTURE = Scroll.getAdventure();
 	private Expression<String> strings;
 
 	@Override
@@ -42,7 +42,7 @@ public class ExprFormatted implements Expression<Text>, Languaged {
 		return strings.stream(context)
 				.filter(Objects::nonNull)
 				.map(MINI_MESSAGE::deserialize)
-				.map(ADVENTURE::toNative)
+				.map(ADVENTURE::asNative)
 				.toArray(Text[]::new);
 	}
 
