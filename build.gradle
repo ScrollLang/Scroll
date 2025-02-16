@@ -24,7 +24,16 @@ base {
 
 repositories {
 	mavenCentral()
+
+	maven {
+		setUrl("https://api.modrinth.com/maven")
+		content {
+			includeGroup("maven.modrinth")
+		}
+	}
+
 	maven { url 'https://maven.fabricmc.net' }
+	
 	maven {
 		url = 'https://maven.pkg.github.com/ScrollLang/skript-parser'
 		credentials {
