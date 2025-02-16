@@ -4,22 +4,29 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on:
+    push:
+        branches:
+            - master
+            - 'dev/**'
+    pull_request:
 
 jobs:
   build:
     strategy:
       matrix:
         # Use these Java versions
-        java: [
-          21,
-        ]
+        java: [21]
         # and run on both Linux and Windows
         os: [ubuntu-latest, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "current"
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v3
       - name: setup jdk ${{ matrix.java }}
@@ -27,16 +34,14 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        if: runner.os != 'Windows'
-        run: chmod +x ./gradlew
+          check-latest: true
       - name: build
-        run: ./gradlew build
+        run: gradle build
         env:
           PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
           PACKAGES_KEY: ${{ secrets.PACKAGES_KEY }}
       - name: capture build artifacts
-        if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from latest java on one OS
+        if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts

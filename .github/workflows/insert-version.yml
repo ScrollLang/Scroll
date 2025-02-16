@@ -16,18 +16,18 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.INSERT_VERSION }}
-      - name: validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "current"
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        if: runner.os != 'Windows'
-        run: chmod +x ./gradlew
+          check-latest: true
       - name: build
-        run: ./gradlew build
+        run: gradle build
         env:
           PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
           PACKAGES_KEY: ${{ secrets.PACKAGES_KEY }}
