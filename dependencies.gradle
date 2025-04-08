@@ -17,7 +17,7 @@ ext {
 	archives_base_name = 'Scroll'
 
 	// Adventure API
-	adventure_version = '6.2.0'
+	adventure_version = '6.3.0'
 
 	// Reflections
 	reflections_version = '0.10.2'
